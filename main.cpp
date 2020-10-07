@@ -152,7 +152,7 @@ bool getSym(int len) {
     }
     return true;
 }
-int main(char* argv) {
+int main(int argc, char* argv[]) {
     std::ios::sync_with_stdio(false);
     FILE* fp;
     fp = fopen(argv[1], "r");
