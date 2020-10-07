@@ -126,12 +126,13 @@ bool getSym(int len) {
             num = transNum(token);
             cout<<"Int("+std::to_string(num)+")"<<endl;
         }
-        else if(isColon(file[i])){
-            if(isEqual(file[i + 1]))
+       else if(isColon(file[i])){
+            if(isEqual(file[i + 1])){
                 cout<<"Assign"<<endl;
+                i++;
+            }
             else
                 cout<<"Colon"<<endl;
-            i++;
         }
         else if(isPlus(file[i]))
             cout<<"Plus"<<endl;
