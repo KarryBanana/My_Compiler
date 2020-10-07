@@ -6,9 +6,9 @@
 #include <sstream>
 using namespace std;
 
-char file[1000]; //±£´æ¶ÁÈ¡µÄÄ¿±ê´úÂë
-string token; //±£´æ¶ÁÈ¡µÄµ¥´Ê
-int num; //¶ÁÈëµÄÕûĞÍÊı×Ö
+char file[1000]; //ä¿å­˜è¯»å–çš„ç›®æ ‡ä»£ç 
+string token; //ä¿å­˜è¯»å–çš„å•è¯
+int num; //è¯»å…¥çš„æ•´å‹æ•°å­—
 
 void clearToken() {
     token = "";
@@ -39,11 +39,11 @@ bool isDigit(char c) {
     return false;
 }
 
-bool isColon(char c) { //Ã°ºÅ
+bool isColon(char c) { //å†’å·
     return c == ':' ? true : false;
 }
 
-bool isComma(char c) { //¶ººÅ
+bool isComma(char c) { //é€—å·
     return c == ',' ? true : false;
 }
 
@@ -51,16 +51,16 @@ bool isEqual(char c){
     return c == '=' ? true : false;
 }
 
-bool isPlus(char c) { //¼ÓºÅ
+bool isPlus(char c) { //åŠ å·
     return c == '+' ? true : false;
 }
-bool isStar(char c) { //ĞÇºÅ
+bool isStar(char c) { //æ˜Ÿå·
     return c == '*' ? true : false;
 }
-bool isLpar(char c) { //×óÀ¨ºÅ
+bool isLpar(char c) { //å·¦æ‹¬å·
     return c == '(' ? true : false;
 }
-bool isRpar(char c) { //ÓÒÀ¨ºÅ
+bool isRpar(char c) { //å³æ‹¬å·
     return c == ')' ? true : false;
 }
 
@@ -92,7 +92,7 @@ bool isKeyword(string s){
     return false;
 }
 
-int transNum(string s){ //ÎŞ·ûºÅÕûÊı,²»³¬¹ıint
+int transNum(string s){ //æ— ç¬¦å·æ•´æ•°,ä¸è¶…è¿‡int
     int i = 0, len = s.size(), value = 0;
     while(s[i] == '0')
         i++;
@@ -115,14 +115,14 @@ bool getSym(int len) {
                 token += file[i];
                 i++;
             }
-            i--; //¶ÁÈ¡µ½·Çletter×Ö·û
+            i--; //è¯»å–åˆ°életterå­—ç¬¦
             if( !isKeyword(token) )
                 cout<<"Ident("+token+")"<<endl;
         }
         else if(isDigit(file[i])){
             while(isDigit(file[i]))
                 token+=file[i++];
-            i--; //¶ÁÈ¡µ½·Çdigit×Ö·û
+            i--; //è¯»å–åˆ°édigitå­—ç¬¦
             num = transNum(token);
             cout<<"Int("+std::to_string(num)+")"<<endl;
         }
@@ -154,7 +154,7 @@ bool getSym(int len) {
 int main() {
     std::ios::sync_with_stdio(false);
     FILE* fp;
-    fp = fopen("code.c", "r");
+    fp = fopen("./target/release/pascal-lexer /tests/1.in", "r");
     while(fscanf(fp,"%s", file) != EOF) {
         int len = strlen(file);
         if(!getSym(len))
