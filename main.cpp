@@ -143,7 +143,7 @@ bool getSym(int len) {
         else if(isLpar(file[i]))
             cout<<"LParenthesis"<<endl;
         else if(isRpar(file[i]))
-            cout<<"RParenthesis	"<<endl;
+            cout<<"RParenthesis"<<endl;
         else{
             cout<<"Unknown"<<endl;
             return false;
