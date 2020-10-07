@@ -158,8 +158,8 @@ int main(int argc, char* argv[]) {
     fp = fopen(argv[1], "r");
     while(fscanf(fp,"%s", file) != EOF) {
         int len = strlen(file);
-        //if(!getSym(len))
-            //break;
+        if(!getSym(len))
+            break;
     }
     fclose(fp);
     return 0;
