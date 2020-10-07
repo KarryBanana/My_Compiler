@@ -152,10 +152,10 @@ bool getSym(int len) {
     }
     return true;
 }
-int main() {
+int main(char* argv) {
     std::ios::sync_with_stdio(false);
     FILE* fp;
-    fp = fopen("./target/release/pascal-lexer/tests/1.in", "r");
+    fp = fopen(argv[1], "r");
     while(fscanf(fp,"%s", file) != EOF) {
         int len = strlen(file);
         if(!getSym(len))
