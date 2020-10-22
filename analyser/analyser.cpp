@@ -223,7 +223,7 @@ std::optional<CompilationError> Analyser::analyseConstantExpression(
   if (!next.has_value())
     return std::make_optional<CompilationError>(
         _current_pos, ErrorCode::ErrConstantNeedValue);
-  std::string str;
+  std::string str = next.value().GetValueString();
   // 无符号整数
   try{
     out = std::stoi(str) * prefix;
