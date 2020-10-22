@@ -410,7 +410,7 @@ std::optional<CompilationError> Analyser::analyseFactor() {
         int32_t num;
         try{
           str = next.value().GetValueString();
-          num = std::stoi(str);
+          num = std::stoi(str) * prefix;
         } catch(std::out_of_range& e){
           return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrIntegerOverflow);
         }
