@@ -243,6 +243,7 @@ std::optional<CompilationError> Analyser::analyseExpression() {
   while (true) {
     // 预读
     auto next = nextToken();
+    //std::cout<<"4"<<next.value().GetValueString()<<"\n";
     if (!next.has_value()) return {};
     auto type = next.value().GetType();
     if (type != TokenType::PLUS_SIGN && type != TokenType::MINUS_SIGN) {
@@ -298,9 +299,12 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
   
   // ;
   next = nextToken();
-    if(!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+  //std::cout<<"last"<<next.value().GetValueString()<<"\n";
+  if(!next.has_value() || next.value().GetType() != TokenType::SEMICOLON){
+      //std::cout<<"semi ???"<<"\n";
       return std::make_optional<CompilationError>(_current_pos,
                                                   ErrorCode::ErrNoSemicolon);
+  }
 
   // 生成指令
   int32_t idx = getIndex(tmp.value().GetValueString());
@@ -313,7 +317,6 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
 std::optional<CompilationError> Analyser::analyseOutputStatement() {
   // 如果之前 <语句序列> 的实现正确，这里第一个 next 一定是 TokenType::PRINT
   auto next = nextToken();
-
   // '('
   next = nextToken();
   if (!next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET)
@@ -351,9 +354,11 @@ std::optional<CompilationError> Analyser::analyseItem() {
   while (true) {
     // {<乘法型运算符><因子>}
     auto next = nextToken();
+    //std::cout<<"3"<<next.value().GetValueString()<<"\n";
     if (!next.has_value()) return {};
     auto type = next.value().GetType();
-    if (type != MULTIPLICATION_SIGN || type != DIVISION_SIGN) {
+    if (type != MULTIPLICATION_SIGN && type != DIVISION_SIGN) {
+      //std::cout<<"not * or /"<<"\n";
       unreadToken();
       return {};
     }
@@ -376,6 +381,7 @@ std::optional<CompilationError> Analyser::analyseItem() {
 std::optional<CompilationError> Analyser::analyseFactor() {
   // [<符号>]
   auto next = nextToken();
+  //std::cout<<"1"<<next.value().GetValueString()<<"\n";
   auto prefix = 1;
   if (!next.has_value())
     return std::make_optional<CompilationError>(
@@ -390,6 +396,7 @@ std::optional<CompilationError> Analyser::analyseFactor() {
 
   // 预读
   next = nextToken();
+  //std::cout<<"2"<<next.value().GetValueString()<<"\n";
   if (!next.has_value())
     return std::make_optional<CompilationError>(
         _current_pos, ErrorCode::ErrIncompleteExpression);
