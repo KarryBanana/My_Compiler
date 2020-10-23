@@ -290,8 +290,12 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
   if(!next.has_value() || next.value().GetType() != TokenType::EQUAL_SIGN)
     return std::make_optional<CompilationError>(_current_pos,
                                                 ErrorCode::ErrIncompleteExpression);  //赋值语句缺等号
+  
+  // 找到未初始化的，改成初始化
+  auto old = tmp.value().GetValueString();
+  _vars[old] = _uninitialized_vars[old];
+  // 删掉未初始化的
   _uninitialized_vars.erase(tmp.value().GetValueString());
-  addVariable(tmp.value());
   // 表达式
   auto err = analyseExpression();
   if(err.has_value())
