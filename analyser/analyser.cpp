@@ -112,45 +112,43 @@ std::optional<CompilationError> Analyser::analyseVariableDeclaration() {
     // 预读？
     auto next = nextToken();
     // 'var'
-    if(!next.has_value())
-      return {};
-    if(next.value().GetType() != TokenType::VAR){
+    if (!next.has_value()) return {};
+    if (next.value().GetType() != TokenType::VAR) {
       unreadToken();
       return {};
     }
     // <标识符>
     next = nextToken();
     auto tmp = next;
-    if(!next.has_value() || next.value().GetType() != TokenType::IDENTIFIER)
+    if (!next.has_value() || next.value().GetType() != TokenType::IDENTIFIER)
       return std::make_optional<CompilationError>(_current_pos,
                                                   ErrorCode::ErrNeedIdentifier);
     // 声明过了
-    if( isDeclared(next.value().GetValueString()))
-      std::make_optional<CompilationError>(_current_pos,
-                                                  ErrorCode::ErrDuplicateDeclaration);
-    
+    if (isDeclared(next.value().GetValueString())) {
+      return std::make_optional<CompilationError>(_current_pos,
+                                           ErrorCode::ErrDuplicateDeclaration);
+    }
     // 变量可能没有初始化，仍然需要一次预读
     next = nextToken();
     // '='
-    if(next.value().GetType() != TokenType::EQUAL_SIGN){
+    if (next.value().GetType() != TokenType::EQUAL_SIGN) {
       _instructions.emplace_back(Operation::LIT, 0);
       addUninitializedVariable(tmp.value());
       unreadToken();
     }
     // '<表达式>'
-    else{
+    else {
       addVariable(tmp.value());
       auto err = analyseExpression();
-      if(err.has_value())
-        return err;
+      if (err.has_value()) return err;
     }
     // ';'
     next = nextToken();
-    if(!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+    if (!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
       return std::make_optional<CompilationError>(_current_pos,
                                                   ErrorCode::ErrNoSemicolon);
-    return {};
   }
+  return {};
 }
 
 // <语句序列> ::= {<语句>}
@@ -278,9 +276,10 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
     return std::make_optional<CompilationError>(_current_pos,
                                                 ErrorCode::ErrNeedIdentifier);
   // 没声明                                          
-  if (!isDeclared(next.value().GetValueString()))
+  if (!isDeclared(next.value().GetValueString())){
       return std::make_optional<CompilationError>(
           _current_pos, ErrorCode::ErrNotDeclared);
+  }
   // 是常量
   if ( isConstant(next.value().GetValueString()) )
     return std::make_optional<CompilationError>(_current_pos,
@@ -290,6 +289,8 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
   if(!next.has_value() || next.value().GetType() != TokenType::EQUAL_SIGN)
     return std::make_optional<CompilationError>(_current_pos,
                                                 ErrorCode::ErrIncompleteExpression);  //赋值语句缺等号
+  _uninitialized_vars.erase(tmp.value().GetValueString());
+  addVariable(tmp.value());
   // 表达式
   auto err = analyseExpression();
   if(err.has_value())
@@ -303,6 +304,7 @@ std::optional<CompilationError> Analyser::analyseAssignmentStatement() {
 
   // 生成指令
   int32_t idx = getIndex(tmp.value().GetValueString());
+  
   _instructions.emplace_back(Operation::STO, idx);
   return {};
 }
@@ -396,8 +398,9 @@ std::optional<CompilationError> Analyser::analyseFactor() {
       // 但是要注意 default 返回的是一个编译错误
       case TokenType::IDENTIFIER :{
 
-        if (!isDeclared(next.value().GetValueString()))
+        if (!isDeclared(next.value().GetValueString())){
           return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotDeclared);
+        }
         if(isUninitializedVariable(next.value().GetValueString()))
           return std::make_optional<CompilationError>(_current_pos, ErrorCode::ErrNotInitialized);
         
