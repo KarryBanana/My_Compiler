@@ -64,7 +64,7 @@ int getNextTerminal(int n)
 bool Recurve(char out) // out为当前栈外读到的终结符
 {
     int idx = top - 1; // 指向栈顶此时的元素
-    if(st[idx] == '+' || st[idx] == '-')
+    if(st[idx] == '+' || st[idx] == '-' || st[idx] == '*')
         return false;
     while( idx >= 0){
         if( !isTerminal(st[idx]) ){
