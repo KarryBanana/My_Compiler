@@ -1,166 +1,172 @@
 #include <iostream>
-#include <cstdlib>
 #include <cstdio>
-#include <string>
+#include <cstdlib>
 #include <cstring>
-#include <sstream>
+#include <stack>
 using namespace std;
 
-char file[1000]; //保存读取的目标代码
-string token; //保存读取的单词
-int num; //读入的整型数字
+char sentence[1500]; //读入的句子
+char st[1500];
+int top = 0;
 
-void clearToken() {
-    token = "";
-    return ;
-}
+/*
+    + * i ( ) #
+  +
+  *
+  i
+  (
+  )
+  #
+*/
+int TokenPri[10][10] =
+{
+    {2,1,1,1,2,2},
+    {2,2,1,1,2,2},
+    {2,2,-1,-1,2,2},
+    {1,1,1,1,0,-1},
+    {2,2,-1,-1,2,2},
+    {1,1,1,1,-1,-1}
+};
 
-bool isSpace(char c) {
-    return c == ' ' ? true : false;
-}
-
-bool isNewline(char c) {
-    return c == '\n' ? true : false;
-}
-
-bool isTab(char c) {
-    return c == '\t' ? true : false;
-}
-
-bool isLetter(char c) {
-    if( (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') )
+bool isTerminal(char c)
+{
+    if(c == '+' || c == '*' || c == 'i' || c == '('||
+        c == ')' || c == '#')
         return true;
     return false;
 }
 
-bool isDigit(char c) {
-    if(c >= '0' && c <= '9')
-        return true;
-    return false;
+int getTokenPos(char c)
+{
+    if(c == '+')
+        return 0;
+    if (c == '*')
+        return 1;
+    if(c == 'i')
+        return 2;
+    if(c == '(')
+        return 3;
+    if( c == ')')
+        return 4;
+    if(c == '#')
+        return 5;
 }
 
-bool isColon(char c) { //冒号
-    return c == ':' ? true : false;
-}
-
-bool isComma(char c) { //逗号
-    return c == ',' ? true : false;
-}
-
-bool isEqual(char c){
-    return c == '=' ? true : false;
-}
-
-bool isPlus(char c) { //加号
-    return c == '+' ? true : false;
-}
-bool isStar(char c) { //星号
-    return c == '*' ? true : false;
-}
-bool isLpar(char c) { //左括号
-    return c == '(' ? true : false;
-}
-bool isRpar(char c) { //右括号
-    return c == ')' ? true : false;
-}
-
-bool isKeyword(string s){
-    if(s == "BEGIN"){
-        cout<<"Begin"<<endl;
-        return true;
+int getNextTerminal(int n)
+{
+    while(n >= 0){
+        if( isTerminal(st[n]) )
+            return n;
+        --n;
     }
-    else if(s == "END"){
-        cout<<"End"<<endl;
-        return true;
-    }
-    else if(s == "FOR"){
-        cout<<"For"<<endl;
-        return true;
-    }
-    else if(s == "IF"){
-        cout<<"If"<<endl;
-        return true;
-    }
-    else if(s == "ELSE"){
-        cout<<"Else"<<endl;
-        return true;
-    }
-    else if(s == "THEN"){
-        cout<<"Then"<<endl;
-        return true;
+    return -1;
+}
+bool Recurve(char out) // out为当前栈外读到的终结符
+{
+    int idx = top - 1; // 指向栈顶此时的元素
+    if(st[idx] == '+' || st[idx] == '-')
+        return false;
+    while( idx >= 0){
+        if( !isTerminal(st[idx]) ){
+            --idx;
+            continue;
+        }
+        // 寻找到下一个终结符
+        int next_pos = getNextTerminal(idx - 1);
+        char next_terminal = st[next_pos];
+        int now = getTokenPos(st[idx]); // 寻找矩阵中的位置
+        int next_token = getTokenPos(next_terminal);
+        // 比较相邻的关系
+        if(TokenPri[next_token][now] == 0){
+            idx = next_pos;
+            continue;
+        }
+        else if(TokenPri[next_token][now] == 1){
+            top = next_pos + 1;
+            st[top++] = 'N';
+            return true;
+        }
     }
     return false;
 }
 
-int transNum(string s){ //无符号整数,不超过int
-    int i = 0, len = s.size(), value = 0;
-    while(s[i] == '0')
-        i++;
-    for(;i < len; ++i){
-        value*= 10;
-        value += s[i] - '0';
+bool checkFinish(char out)
+{
+    if(top == 2){
+        if(st[0] == '#' && (!isTerminal(st[1])) &&
+           out == '#')
+            return true;
     }
-    return value;
+    return false;
 }
 
-bool getSym(int len) {
-    int i = 0;
-    while(i < len) {
-        token = "";
-        while(isSpace(file[i]) || isNewline(file[i]) ||
-                isTab(file[i]))
-            i++;
-        if( isLetter(file[i]) ) {
-            while( isLetter(file[i]) || isDigit(file[i]) ) {
-                token += file[i];
-                i++;
-            }
-            i--; //读取到非letter字符
-            if( !isKeyword(token) )
-                cout<<"Ident("+token+")"<<endl;
-        }
-        else if(isDigit(file[i])){
-            while(isDigit(file[i]))
-                token+=file[i++];
-            i--; //读取到非digit字符
-            num = transNum(token);
-            cout<<"Int("+std::to_string(num)+")"<<endl;
-        }
-       else if(isColon(file[i])){
-            if(isEqual(file[i + 1])){
-                cout<<"Assign"<<endl;
-                i++;
-            }
-            else
-                cout<<"Colon"<<endl;
-        }
-        else if(isPlus(file[i]))
-            cout<<"Plus"<<endl;
-        else if(isStar(file[i]))
-            cout<<"Star"<<endl;
-        else if(isComma(file[i]))
-            cout<<"Comma"<<endl;
-        else if(isLpar(file[i]))
-            cout<<"LParenthesis"<<endl;
-        else if(isRpar(file[i]))
-            cout<<"RParenthesis"<<endl;
-        else{
-            cout<<"Unknown"<<endl;
-            return false;
-        }
-        i++;
-    }
-    return true;
-}
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     std::ios::sync_with_stdio(false);
     FILE* fp;
     fp = fopen(argv[1], "r");
-    while(fscanf(fp,"%s", file) != EOF) {
-        int len = strlen(file);
-        if(!getSym(len))
+    fscanf(fp,"%s",sentence);
+    st[top++] = '#'; //先将#入栈
+    int len = strlen(sentence);
+    sentence[len] = '#';
+    for(int i = 0; i<len + 1; ++i){ //末尾加入#,长度+1
+        char out = sentence[i];
+        if(out == '\r' || out == '\n')
+            break;
+        //cout<<"it is "<<out<<"\n";
+        if( !isTerminal(out) ){ //无法识别读入符号
+            cout<<"E"<<endl;
+            break;
+        }
+        //栈顶
+        if( isTerminal(st[top - 1]) ){ //栈顶是终结符
+            int pos1 = getTokenPos(st[top - 1]);
+            int pos2 = getTokenPos(out);
+
+            if(TokenPri[pos1][pos2] == -1){
+                cout<<"E"<<endl;
+                break;
+            }
+            else if(TokenPri[pos1][pos2] < 2){ // 入栈
+                cout<<"I"<<sentence[i]<<endl;
+                st[top++] = sentence[i];
+            }
+            else{ // 规约
+                if(!Recurve(sentence[i])){
+                    cout<<"RE"<<endl;
+                    break;
+                }
+                // 规约成功
+                cout<<"R"<<endl;
+                --i;
+            }
+        }
+        //栈次顶
+        else if( isTerminal(st[top - 2])){
+            int pos1 = getTokenPos(st[top - 2]);
+            int pos2 = getTokenPos(out);
+
+            if(TokenPri[pos1][pos2] == -1){
+                cout<<"E"<<endl;
+                break;
+            }
+            else if(TokenPri[pos1][pos2] < 2){ // 入栈
+                cout<<"I"<<sentence[i]<<endl;
+                st[top++] = sentence[i];
+            }
+            else{ // 规约
+                if(!Recurve(sentence[i])){
+                    cout<<"RE"<<endl;
+                    break;
+                }
+                // 规约成功
+                cout<<"R"<<endl;
+                --i;
+            }
+        }
+
+        if(checkFinish(out)) // 检查是否规约结束了
             break;
     }
-    fclose(fp);
     return 0;
 }
