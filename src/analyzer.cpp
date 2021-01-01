@@ -183,6 +183,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
             }
         }
     } 
+    out.close();
     return {};
 }
 
