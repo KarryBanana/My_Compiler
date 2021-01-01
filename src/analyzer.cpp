@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
+#include <string.h>
 
 
 Stack s; // 模拟栈
@@ -11,6 +12,15 @@ std::vector<FunctionList> flist; // 函数列表
 Layer l;
 int cmp = 0; // 用来区分 br.true 和 br.false
 int main_num = -1; // 用来记main函数的编号
+
+char* Analyzer::reverseData(unsigned char *num, int len)
+{
+    unsigned char *tmp = (unsigned char *)malloc(sizeof(num));
+    for(int i = 0; i<len; ++i){
+        tmp[i] = num[len - i - 1];
+    }
+    return (char*)tmp;
+}
 std::pair<bool, std::optional<CompilationError>>
 Analyzer::Analyze(std::string output) 
 {
@@ -34,9 +44,16 @@ Analyzer::Analyze(std::string output)
 // <程序>
 std::optional<CompilationError> Analyzer::Program(std::string output)
 {
-    std::ofstream out(output); // 输出文件
-    out<<"72303b3e\n"; // magic
-    out<<"00000001\n"; // version
+    //std::cout<<"---------------output addr is "<<output<<std::endl;
+    std::ofstream out(output, std::ios::out | std::ios::binary); // 输出文件
+    if( !out.is_open() ) {
+        std::cout << "Error output file";
+        exit(1);
+    }
+    int magic = 0x72303b3e;
+    int version = 0x00000001;
+    out.write(reverseData((unsigned char *)&magic, sizeof(magic)), sizeof(magic)); // magic
+    out.write(reverseData((unsigned char *)&version, sizeof(version)), sizeof(version)); // version
     int tmp = 0; int *cnt = &tmp;
     while(true){
         // 预读一个token,看看是不是声明语句
@@ -93,58 +110,78 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
     if(main_num == -1) // 没有找到main函数
         return std::make_optional<CompilationError>(ErrorCode::NoMain); 
     if(out.is_open()){ // 全局变量的个数为 globas + funcs + _start函数
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<l.action_layer.front().symbols.size() + flist.size() <<std::endl; // count 补充前导零至4字节
+        int globa_num = l.action_layer.front().symbols.size() + flist.size();
+        out.write(reverseData((unsigned char *)&globa_num, sizeof(globa_num)), sizeof(globa_num)); // 所有全局变量的个数 
         std::vector<Token> globas = l.action_layer.front().symbols;
         int len_globas = globas.size();
         for(int i = 0;i<len_globas;++i){ //先处理函数外的全局变量
-            out<<std::hex<<std::setw(2)<<std::setfill('0')<<globas[i].is_const<<std::endl;
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<8<<std::endl; // count 补充前导零至4字节
-            out<<std::hex<<std::setw(16)<<std::setfill('0')<<0<<std::endl; // 全局变量初始都是0，后续补充string类型
+            out.write(reverseData((unsigned char *)&globas[i].is_const, sizeof(bool)), sizeof(bool));
+            int var_len = 0x00000008; // 变量值的字节数为4字节
+            out.write(reverseData((unsigned char *)&var_len, sizeof(int)), sizeof(int)); // 变量值的长度
+            long var_value = 0; // 全局变量初始都是0
+            out.write(reverseData((unsigned char *)&var_value, sizeof(long)), sizeof(long)); // 后续补充string类型
         }
-        out<<std::hex<<std::setw(2)<<std::setfill('0')<<1<<std::endl; // _start
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<6<<std::endl; // count 补充前导零至4字节
-        out<<"_start"<<std::endl; // count 补充前导零至4字节
+        bool _startIsConst = 0x01;
+        out.write(reverseData((unsigned char *)&_startIsConst, sizeof(bool)), sizeof(bool)); // _start是全局
+        int _startcnt = 0x06;
+        out.write(reverseData((unsigned char *)&_startcnt, sizeof(int)), sizeof(int)); // 函数名长度
+        char _start[] = "_start";
+        out.write(_start, strlen(_start)); // _start函数名
 
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<flist.size()<<std::endl; // 函数的个数 包括_start
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<globas.size()<<std::endl; // _start在全局变量中的位置
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<0<<std::endl; // _start无return
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<0<<std::endl; // _start无params
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<0<<std::endl; // _start无局部变量
-        out<<std::hex<<std::setw(8)<<std::setfill('0')<<flist.front()._instrucs.size()<<std::endl; // _start中的指令个数
-        int _startFuncInstruc = flist.front()._instrucs.size();
-        //std::cout<<"_start has "<<_startFuncInstruc<<" instrus"<<std::endl;
-        for (int i = 0; i < _startFuncInstruc; ++i) { // _start具体指令
+        int func_num = flist.size(); // 函数的个数 包括_start
+        out.write(reverseData((unsigned char *)&func_num, sizeof(int)), sizeof(int));
+
+        int _startIdx = globas.size(); // _start在全局变量中的位置
+        out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int));
+        int _startReturn = 0;
+        out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无return
+        out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int)); // _start无params 因为值都是0，就偷懒了
+        out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int)); // _start无局部变量
+        int _startInstruc = flist.front()._instrucs.size();  // _start中的指令个数
+        out.write(reverseData((unsigned char *)&_startInstruc, sizeof(int)), sizeof(int));
+        // //std::cout<<"_start has "<<_startFuncInstruc<<" instrus"<<std::endl;
+        for (int i = 0; i < _startInstruc; ++i) { // _start具体指令
             Instruction ins = flist.front()._instrucs[i];
-            out<< std::hex << std::setw(2) << std::setfill('0')<< ins.ins_num;  // 16进制补充前导零
+            unsigned char instrucNum = ins.ins_num;
+            out.write(reverseData((unsigned char *)&instrucNum, sizeof(char)), sizeof(char));  // 指令数
             if (ins.has_op_num){
                 if(ins.ins_num == 0x01)
-                    out<< std::hex << std::setw(16) << std::setfill('0')<< ins.op_num << std::endl; // push操作数是8字节
+                    out.write(reverseData((unsigned char *)&ins.op_num, sizeof(long)), sizeof(long)); // push操作数是8字节
                 else
-                    out<< std::hex << std::setw(8) << std::setfill('0')<< ins.op_num << std::endl;
+                    out.write(reverseData((unsigned char *)&ins.op_num, sizeof(int)), sizeof(int)); // 否则是4字节
             }
-            else
-                out<< std::endl;
         }
         for(int i = 1; i < flist.size(); ++i){ // 处理剩下的函数
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<globas.size() + i<<std::endl; // 函数在全局变量中的位置
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<!flist[i].void_return<<std::endl; // 函数return 是void还是非void
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<flist[i]._params.size()<<std::endl; // 函数参数个数
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<flist[i]._vars.size()<<std::endl; // 函数局部变量个数
-            out<<std::hex<<std::setw(8)<<std::setfill('0')<<flist[i]._instrucs.size()<<std::endl; // 函数中的指令个数
+            int funcIdx = globas.size() + i; // 函数在全局变量中的位置
+            out.write(reverseData((unsigned char *)&funcIdx, sizeof(int)), sizeof(int));
+            int func_return = !flist[i].void_return;  // 函数return 是void还是非void
+            out.write(reverseData((unsigned char *)&func_return, sizeof(int)), sizeof(int));
+            int arga_num = flist[i]._params.size(); // 函数参数个数 
+            out.write(reverseData((unsigned char *)&arga_num, sizeof(int)), sizeof(int)); 
+            int loca_num = flist[i]._vars.size(); // 函数局部变量个数
+            out.write(reverseData((unsigned char *)&loca_num, sizeof(int)), sizeof(int));  
+            int instruc_num = flist[i]._instrucs.size(); // 函数中的指令个数
+            out.write(reverseData((unsigned char *)&instruc_num, sizeof(int)), sizeof(int));
             int FuncInstruc = flist[i]._instrucs.size();
             for (int j = 0; j < FuncInstruc; ++j) {  // _start具体指令
                 Instruction ins = flist[i]._instrucs[j];
-                out << std::hex << std::setw(2) << std::setfill('0') << ins.ins_num;  // 16进制补充前导零
+                unsigned char instrucNum = ins.ins_num;
+                out.write(
+                    reverseData((unsigned char*)&instrucNum, sizeof(char)),
+                    sizeof(char));  // 指令数
                 if (ins.has_op_num) {
                     if (ins.ins_num == 0x01)
-                        out << std::hex << std::setw(16) << std::setfill('0') << ins.op_num << std::endl;  // push操作数是8字节
+                        out.write(reverseData((unsigned char*)&ins.op_num,
+                                              sizeof(long)),
+                                  sizeof(long));  // push操作数是8字节
                     else
-                        out << std::hex << std::setw(8) << std::setfill('0')  << ins.op_num << std::endl;
-                } else
-                    out << std::endl;
+                        out.write(reverseData((unsigned char*)&ins.op_num,
+                                              sizeof(int)),
+                                  sizeof(int));  // 否则是4字节
+                }
             }
         }
-    }
+    } 
     return {};
 }
 

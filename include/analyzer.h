@@ -79,6 +79,7 @@ class Analyzer {
     bool isVarDuplic(Token t);
     // 判断函数名是否重复
     bool isFuncDuplic(Token t);
+    char* reverseData(unsigned char *num, int len);
 
   private:
     std::vector<Token> _tokens; //存放词法分析完的tokens

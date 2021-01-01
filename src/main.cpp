@@ -49,7 +49,7 @@ int main(int argc, char** argv)
     //         std::cout<<tk.first[i].GetType()<<" "<<tk.first[i].GetValueString()<<std::endl;
     //     }
     // }
-    bool flag = Analyze("../analyzer_test.txt", "./out.o0"); // analyzer_test
+    bool flag = Analyze(argv[1], argv[2]); // analyzer_test
     if(!flag)
         return -1;
     return 0;
