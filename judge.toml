@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 [jobs.c0]
 
 image = { source = "dockerfile", path = ".", tag = "pascal-lex-example" }

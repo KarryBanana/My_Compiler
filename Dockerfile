@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 FROM gcc:4.7
 WORKDIR /app/
 COPY ./* ./
