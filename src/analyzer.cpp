@@ -5,17 +5,15 @@
 #include <iostream>
 #include <fstream>
 
-std::ofstream out("out.o0"); // 输出文件
+
 Stack s; // 模拟栈
 std::vector<FunctionList> flist; // 函数列表
 Layer l;
 int cmp = 0; // 用来区分 br.true 和 br.false
 int main_num = -1; // 用来记main函数的编号
 std::pair<bool, std::optional<CompilationError>>
-Analyzer::Analyze() 
+Analyzer::Analyze(std::string output) 
 {
-    out<<"72303b3e\n"; // magic
-    out<<"00000001\n"; // version
     //std::cout<<_tokens.size()<<std::endl;
     // 程序最开始, 全局变量是第0层
     struct ActionLayer act;
@@ -25,7 +23,7 @@ Analyzer::Analyze()
     struct FunctionList f;
     flist.emplace_back(f);
     
-    auto result = Program();
+    auto result = Program(output);
     if(result.has_value())
         return std::make_pair(bool(), result);
     else 
@@ -34,8 +32,11 @@ Analyzer::Analyze()
 }
 
 // <程序>
-std::optional<CompilationError> Analyzer::Program()
+std::optional<CompilationError> Analyzer::Program(std::string output)
 {
+    std::ofstream out(output); // 输出文件
+    out<<"72303b3e\n"; // magic
+    out<<"00000001\n"; // version
     int tmp = 0; int *cnt = &tmp;
     while(true){
         // 预读一个token,看看是不是声明语句

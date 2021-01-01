@@ -17,11 +17,11 @@ class Analyzer {
     Analyzer(std::vector<Token> tk)
     : _tokens(tk), _offset(0){}
   public:
-    std::pair<bool, std::optional<CompilationError>> Analyze();
+    std::pair<bool, std::optional<CompilationError>> Analyze(std::string output);
 
   private:
     // <程序>
-    std::optional<CompilationError> Program();
+    std::optional<CompilationError> Program(std::string output);
     std::optional<CompilationError> DeclareStatement(int *cnt);
     std::optional<CompilationError> Function();
     // 函数参数列表
