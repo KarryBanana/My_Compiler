@@ -61,10 +61,10 @@ RM = "C:\Program Files\CMake\bin\cmake.exe" -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "D:\Code C++\cmake_test"
+CMAKE_SOURCE_DIR = C:\Users\bill8\Desktop\c0_compiler
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "D:\Code C++\cmake_test\build"
+CMAKE_BINARY_DIR = C:\Users\bill8\Desktop\c0_compiler\build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/cmake_test.dir/depend.make
@@ -78,72 +78,72 @@ include CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj: CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj: CMakeFiles/cmake_test.dir/includes_CXX.rsp
 CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj: ../src/action_scope.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\action_scope.cpp.obj -c "D:\Code C++\cmake_test\src\action_scope.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\action_scope.cpp.obj -c C:\Users\bill8\Desktop\c0_compiler\src\action_scope.cpp
 
 CMakeFiles/cmake_test.dir/src/action_scope.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cmake_test.dir/src/action_scope.cpp.i"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\Code C++\cmake_test\src\action_scope.cpp" > CMakeFiles\cmake_test.dir\src\action_scope.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\bill8\Desktop\c0_compiler\src\action_scope.cpp > CMakeFiles\cmake_test.dir\src\action_scope.cpp.i
 
 CMakeFiles/cmake_test.dir/src/action_scope.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cmake_test.dir/src/action_scope.cpp.s"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\Code C++\cmake_test\src\action_scope.cpp" -o CMakeFiles\cmake_test.dir\src\action_scope.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\bill8\Desktop\c0_compiler\src\action_scope.cpp -o CMakeFiles\cmake_test.dir\src\action_scope.cpp.s
 
 CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj: CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj: CMakeFiles/cmake_test.dir/includes_CXX.rsp
 CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj: ../src/analyzer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\analyzer.cpp.obj -c "D:\Code C++\cmake_test\src\analyzer.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\analyzer.cpp.obj -c C:\Users\bill8\Desktop\c0_compiler\src\analyzer.cpp
 
 CMakeFiles/cmake_test.dir/src/analyzer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cmake_test.dir/src/analyzer.cpp.i"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\Code C++\cmake_test\src\analyzer.cpp" > CMakeFiles\cmake_test.dir\src\analyzer.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\bill8\Desktop\c0_compiler\src\analyzer.cpp > CMakeFiles\cmake_test.dir\src\analyzer.cpp.i
 
 CMakeFiles/cmake_test.dir/src/analyzer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cmake_test.dir/src/analyzer.cpp.s"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\Code C++\cmake_test\src\analyzer.cpp" -o CMakeFiles\cmake_test.dir\src\analyzer.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\bill8\Desktop\c0_compiler\src\analyzer.cpp -o CMakeFiles\cmake_test.dir\src\analyzer.cpp.s
 
 CMakeFiles/cmake_test.dir/src/main.cpp.obj: CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/main.cpp.obj: CMakeFiles/cmake_test.dir/includes_CXX.rsp
 CMakeFiles/cmake_test.dir/src/main.cpp.obj: ../src/main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/cmake_test.dir/src/main.cpp.obj"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\main.cpp.obj -c "D:\Code C++\cmake_test\src\main.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/cmake_test.dir/src/main.cpp.obj"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\main.cpp.obj -c C:\Users\bill8\Desktop\c0_compiler\src\main.cpp
 
 CMakeFiles/cmake_test.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cmake_test.dir/src/main.cpp.i"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\Code C++\cmake_test\src\main.cpp" > CMakeFiles\cmake_test.dir\src\main.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\bill8\Desktop\c0_compiler\src\main.cpp > CMakeFiles\cmake_test.dir\src\main.cpp.i
 
 CMakeFiles/cmake_test.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cmake_test.dir/src/main.cpp.s"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\Code C++\cmake_test\src\main.cpp" -o CMakeFiles\cmake_test.dir\src\main.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\bill8\Desktop\c0_compiler\src\main.cpp -o CMakeFiles\cmake_test.dir\src\main.cpp.s
 
 CMakeFiles/cmake_test.dir/src/test.cpp.obj: CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/test.cpp.obj: CMakeFiles/cmake_test.dir/includes_CXX.rsp
 CMakeFiles/cmake_test.dir/src/test.cpp.obj: ../src/test.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/cmake_test.dir/src/test.cpp.obj"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\test.cpp.obj -c "D:\Code C++\cmake_test\src\test.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/cmake_test.dir/src/test.cpp.obj"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\test.cpp.obj -c C:\Users\bill8\Desktop\c0_compiler\src\test.cpp
 
 CMakeFiles/cmake_test.dir/src/test.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cmake_test.dir/src/test.cpp.i"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\Code C++\cmake_test\src\test.cpp" > CMakeFiles\cmake_test.dir\src\test.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\bill8\Desktop\c0_compiler\src\test.cpp > CMakeFiles\cmake_test.dir\src\test.cpp.i
 
 CMakeFiles/cmake_test.dir/src/test.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cmake_test.dir/src/test.cpp.s"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\Code C++\cmake_test\src\test.cpp" -o CMakeFiles\cmake_test.dir\src\test.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\bill8\Desktop\c0_compiler\src\test.cpp -o CMakeFiles\cmake_test.dir\src\test.cpp.s
 
 CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj: CMakeFiles/cmake_test.dir/flags.make
 CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj: CMakeFiles/cmake_test.dir/includes_CXX.rsp
 CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj: ../src/tokenizer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\tokenizer.cpp.obj -c "D:\Code C++\cmake_test\src\tokenizer.cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj"
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\cmake_test.dir\src\tokenizer.cpp.obj -c C:\Users\bill8\Desktop\c0_compiler\src\tokenizer.cpp
 
 CMakeFiles/cmake_test.dir/src/tokenizer.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/cmake_test.dir/src/tokenizer.cpp.i"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E "D:\Code C++\cmake_test\src\tokenizer.cpp" > CMakeFiles\cmake_test.dir\src\tokenizer.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\bill8\Desktop\c0_compiler\src\tokenizer.cpp > CMakeFiles\cmake_test.dir\src\tokenizer.cpp.i
 
 CMakeFiles/cmake_test.dir/src/tokenizer.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/cmake_test.dir/src/tokenizer.cpp.s"
-	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "D:\Code C++\cmake_test\src\tokenizer.cpp" -o CMakeFiles\cmake_test.dir\src\tokenizer.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\bill8\Desktop\c0_compiler\src\tokenizer.cpp -o CMakeFiles\cmake_test.dir\src\tokenizer.cpp.s
 
 # Object files for target cmake_test
 cmake_test_OBJECTS = \
@@ -165,7 +165,7 @@ cmake_test.exe: CMakeFiles/cmake_test.dir/build.make
 cmake_test.exe: CMakeFiles/cmake_test.dir/linklibs.rsp
 cmake_test.exe: CMakeFiles/cmake_test.dir/objects1.rsp
 cmake_test.exe: CMakeFiles/cmake_test.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir="D:\Code C++\cmake_test\build\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable cmake_test.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable cmake_test.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\cmake_test.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -178,6 +178,6 @@ CMakeFiles/cmake_test.dir/clean:
 .PHONY : CMakeFiles/cmake_test.dir/clean
 
 CMakeFiles/cmake_test.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" "D:\Code C++\cmake_test" "D:\Code C++\cmake_test" "D:\Code C++\cmake_test\build" "D:\Code C++\cmake_test\build" "D:\Code C++\cmake_test\build\CMakeFiles\cmake_test.dir\DependInfo.cmake" --color=$(COLOR)
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\bill8\Desktop\c0_compiler C:\Users\bill8\Desktop\c0_compiler C:\Users\bill8\Desktop\c0_compiler\build C:\Users\bill8\Desktop\c0_compiler\build C:\Users\bill8\Desktop\c0_compiler\build\CMakeFiles\cmake_test.dir\DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/cmake_test.dir/depend
 

@@ -42,7 +42,6 @@
         "typeinfo": "cpp",
         "map": "cpp",
         "ctime": "cpp",
-        "iomanip": "cpp",
-        "cstring": "cpp"
+        "iomanip": "cpp"
     }
 }

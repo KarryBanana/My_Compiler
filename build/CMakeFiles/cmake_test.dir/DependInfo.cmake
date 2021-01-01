@@ -4,11 +4,11 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "D:/Code C++/cmake_test/src/action_scope.cpp" "D:/Code C++/cmake_test/build/CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj"
-  "D:/Code C++/cmake_test/src/analyzer.cpp" "D:/Code C++/cmake_test/build/CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj"
-  "D:/Code C++/cmake_test/src/main.cpp" "D:/Code C++/cmake_test/build/CMakeFiles/cmake_test.dir/src/main.cpp.obj"
-  "D:/Code C++/cmake_test/src/test.cpp" "D:/Code C++/cmake_test/build/CMakeFiles/cmake_test.dir/src/test.cpp.obj"
-  "D:/Code C++/cmake_test/src/tokenizer.cpp" "D:/Code C++/cmake_test/build/CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj"
+  "C:/Users/bill8/Desktop/c0_compiler/src/action_scope.cpp" "C:/Users/bill8/Desktop/c0_compiler/build/CMakeFiles/cmake_test.dir/src/action_scope.cpp.obj"
+  "C:/Users/bill8/Desktop/c0_compiler/src/analyzer.cpp" "C:/Users/bill8/Desktop/c0_compiler/build/CMakeFiles/cmake_test.dir/src/analyzer.cpp.obj"
+  "C:/Users/bill8/Desktop/c0_compiler/src/main.cpp" "C:/Users/bill8/Desktop/c0_compiler/build/CMakeFiles/cmake_test.dir/src/main.cpp.obj"
+  "C:/Users/bill8/Desktop/c0_compiler/src/test.cpp" "C:/Users/bill8/Desktop/c0_compiler/build/CMakeFiles/cmake_test.dir/src/test.cpp.obj"
+  "C:/Users/bill8/Desktop/c0_compiler/src/tokenizer.cpp" "C:/Users/bill8/Desktop/c0_compiler/build/CMakeFiles/cmake_test.dir/src/tokenizer.cpp.obj"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

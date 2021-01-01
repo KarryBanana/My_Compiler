@@ -6,17 +6,17 @@
 
 #IncludeRegexTransform: 
 
-D:/Code C++/cmake_test/include/Stack.h
+C:/Users/bill8/Desktop/c0_compiler/include/Stack.h
 vector
 -
 
-D:/Code C++/cmake_test/include/action_scope.h
+C:/Users/bill8/Desktop/c0_compiler/include/action_scope.h
 ./token.h
-D:/Code C++/cmake_test/include/token.h
+C:/Users/bill8/Desktop/c0_compiler/include/token.h
 vector
 -
 
-D:/Code C++/cmake_test/include/analyzer.h
+C:/Users/bill8/Desktop/c0_compiler/include/analyzer.h
 cstddef
 -
 cstdint
@@ -30,21 +30,21 @@ utility
 vector
 -
 error.h
-D:/Code C++/cmake_test/include/error.h
+C:/Users/bill8/Desktop/c0_compiler/include/error.h
 token.h
-D:/Code C++/cmake_test/include/token.h
+C:/Users/bill8/Desktop/c0_compiler/include/token.h
 action_scope.h
-D:/Code C++/cmake_test/include/action_scope.h
+C:/Users/bill8/Desktop/c0_compiler/include/action_scope.h
 Stack.h
-D:/Code C++/cmake_test/include/Stack.h
+C:/Users/bill8/Desktop/c0_compiler/include/Stack.h
 
-D:/Code C++/cmake_test/include/error.h
+C:/Users/bill8/Desktop/c0_compiler/include/error.h
 iostream
 -
 string
 -
 
-D:/Code C++/cmake_test/include/token.h
+C:/Users/bill8/Desktop/c0_compiler/include/token.h
 any
 -
 string
@@ -52,7 +52,7 @@ string
 iostream
 -
 
-D:/Code C++/cmake_test/include/tokenizer.h
+C:/Users/bill8/Desktop/c0_compiler/include/tokenizer.h
 string
 -
 vector
@@ -62,17 +62,17 @@ optional
 cctype
 -
 token.h
-D:/Code C++/cmake_test/include/token.h
+C:/Users/bill8/Desktop/c0_compiler/include/token.h
 error.h
-D:/Code C++/cmake_test/include/error.h
+C:/Users/bill8/Desktop/c0_compiler/include/error.h
 
-D:/Code C++/cmake_test/src/main.cpp
+C:/Users/bill8/Desktop/c0_compiler/src/main.cpp
 iostream
 -
 ../include/analyzer.h
-D:/Code C++/cmake_test/include/analyzer.h
+C:/Users/bill8/Desktop/c0_compiler/include/analyzer.h
 ../include/tokenizer.h
-D:/Code C++/cmake_test/include/tokenizer.h
+C:/Users/bill8/Desktop/c0_compiler/include/tokenizer.h
 fstream
 -
 

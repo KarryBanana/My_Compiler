@@ -1,4 +1,4 @@
-# Install script for directory: D:/Code C++/cmake_test
+# Install script for directory: C:/Users/bill8/Desktop/c0_compiler
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/Code C++/cmake_test/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/bill8/Desktop/c0_compiler/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
