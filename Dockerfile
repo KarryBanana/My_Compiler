@@ -4,4 +4,4 @@ WORKDIR /app/
 COPY . /app/
 WORKDIR /app/build
 RUN cmake ..
-RUN make -j4
+RUN make 
