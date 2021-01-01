@@ -3,5 +3,5 @@
 image = { source = "dockerfile", path = ".", tag = "miniplc0-cpp" }
 
 run = [
-  "./cmake_test $input -o $asm",
+  "./cmake_test $input $asm",
 ]

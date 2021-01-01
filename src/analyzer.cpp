@@ -54,6 +54,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
     int version = 0x00000001;
     out.write(reverseData((unsigned char *)&magic, sizeof(magic)), sizeof(magic)); // magic
     out.write(reverseData((unsigned char *)&version, sizeof(version)), sizeof(version)); // version
+
     int tmp = 0; int *cnt = &tmp;
     while(true){
         // 预读一个token,看看是不是声明语句
