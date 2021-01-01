@@ -34,6 +34,7 @@ Analyzer::Analyze(std::string output)
 // <程序>
 std::optional<CompilationError> Analyzer::Program(std::string output)
 {
+    std::cout<<"---------------output addr is "<<output<<std::endl;
     std::ofstream out(output); // 输出文件
     out<<"72303b3e\n"; // magic
     out<<"00000001\n"; // version
