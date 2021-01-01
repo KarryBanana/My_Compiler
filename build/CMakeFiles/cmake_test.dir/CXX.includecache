@@ -1,0 +1,78 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+D:/Code C++/cmake_test/include/Stack.h
+vector
+-
+
+D:/Code C++/cmake_test/include/action_scope.h
+./token.h
+D:/Code C++/cmake_test/include/token.h
+vector
+-
+
+D:/Code C++/cmake_test/include/analyzer.h
+cstddef
+-
+cstdint
+-
+map
+-
+optional
+-
+utility
+-
+vector
+-
+error.h
+D:/Code C++/cmake_test/include/error.h
+token.h
+D:/Code C++/cmake_test/include/token.h
+action_scope.h
+D:/Code C++/cmake_test/include/action_scope.h
+Stack.h
+D:/Code C++/cmake_test/include/Stack.h
+
+D:/Code C++/cmake_test/include/error.h
+iostream
+-
+string
+-
+
+D:/Code C++/cmake_test/include/token.h
+any
+-
+string
+-
+iostream
+-
+
+D:/Code C++/cmake_test/include/tokenizer.h
+string
+-
+vector
+-
+optional
+-
+cctype
+-
+token.h
+D:/Code C++/cmake_test/include/token.h
+error.h
+D:/Code C++/cmake_test/include/error.h
+
+D:/Code C++/cmake_test/src/main.cpp
+iostream
+-
+../include/analyzer.h
+D:/Code C++/cmake_test/include/analyzer.h
+../include/tokenizer.h
+D:/Code C++/cmake_test/include/tokenizer.h
+fstream
+-
+
