@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+../include/test.h
+iostream
+-
+
 C:/Users/bill8/Desktop/c0_compiler/include/Stack.h
 vector
 -
@@ -44,6 +48,18 @@ iostream
 string
 -
 
+C:/Users/bill8/Desktop/c0_compiler/include/function_list.h
+token.h
+C:/Users/bill8/Desktop/c0_compiler/include/token.h
+vector
+C:/Users/bill8/Desktop/c0_compiler/include/vector
+analyzer.h
+C:/Users/bill8/Desktop/c0_compiler/include/analyzer.h
+instruction.h
+C:/Users/bill8/Desktop/c0_compiler/include/instruction.h
+
+C:/Users/bill8/Desktop/c0_compiler/include/instruction.h
+
 C:/Users/bill8/Desktop/c0_compiler/include/token.h
 any
 -
@@ -66,6 +82,24 @@ C:/Users/bill8/Desktop/c0_compiler/include/token.h
 error.h
 C:/Users/bill8/Desktop/c0_compiler/include/error.h
 
+C:/Users/bill8/Desktop/c0_compiler/src/action_scope.cpp
+../include/action_scope.h
+C:/Users/bill8/Desktop/c0_compiler/include/action_scope.h
+
+C:/Users/bill8/Desktop/c0_compiler/src/analyzer.cpp
+../include/analyzer.h
+C:/Users/bill8/Desktop/c0_compiler/include/analyzer.h
+../include/action_scope.h
+C:/Users/bill8/Desktop/c0_compiler/include/action_scope.h
+../include/function_list.h
+C:/Users/bill8/Desktop/c0_compiler/include/function_list.h
+iomanip
+-
+iostream
+-
+fstream
+-
+
 C:/Users/bill8/Desktop/c0_compiler/src/main.cpp
 iostream
 -
@@ -74,5 +108,21 @@ C:/Users/bill8/Desktop/c0_compiler/include/analyzer.h
 ../include/tokenizer.h
 C:/Users/bill8/Desktop/c0_compiler/include/tokenizer.h
 fstream
+-
+
+C:/Users/bill8/Desktop/c0_compiler/src/test.cpp
+test.h
+C:/Users/bill8/Desktop/c0_compiler/src/test.h
+
+C:/Users/bill8/Desktop/c0_compiler/src/tokenizer.cpp
+../include/tokenizer.h
+C:/Users/bill8/Desktop/c0_compiler/include/tokenizer.h
+cstdio
+-
+cctype
+-
+fstream
+-
+sstream
 -
 
