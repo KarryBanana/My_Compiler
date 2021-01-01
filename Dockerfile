@@ -1,4 +1,4 @@
-FROM gcc:4.7
+FROM gcc:7.1
 WORKDIR /app/
 COPY ./* ./
 RUN gcc -o main main.cpp -lstdc++ -std=c++17
