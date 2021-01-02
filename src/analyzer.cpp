@@ -438,11 +438,11 @@ std::optional<CompilationError> Analyzer::BlockStatement(int *cnt)
     l.action_layer.emplace_back(act);
     while (true) {
         next = nextToken();
-        if( next.value().GetType() == TokenType::R_BRACE ){
+        if(!next.has_value() || next.value().GetType() == TokenType::R_BRACE){
             unreadToken();
             break;
         }
-        else{
+        else{ // 有值并且不是 }
             unreadToken();
             auto err = Statement(cnt);
             if( err.has_value() )
