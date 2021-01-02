@@ -107,12 +107,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                 break;
         }
     }
-    for(int i = 1; i<flist.size(); ++i){
-        if(flist[i].func_name == "main"){
-            main_num = l.action_layer.front().symbols.size() -1 + i;
-            break;
-        }
-    }
+
     if(main_num == -1) // 没有找到main函数
         return std::make_optional<CompilationError>(ErrorCode::NoMain); 
     if(out.is_open()){ // 全局变量的个数为 globas + funcs + _start函数
@@ -280,6 +275,8 @@ std::optional<CompilationError> Analyzer::Function()
         return std::make_optional<CompilationError>(ErrorCode::DuplicateFunc);
     flist.back().func_name = idnt.value().GetValueString();
     
+    if(idnt.value().GetValueString() == "main")
+        main_num = flist.size() - 1;
     // std::cout<<"function name"<<std::endl;
     // (
     auto l_brace = nextToken();
