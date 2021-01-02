@@ -117,10 +117,24 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
         for(int i = 0;i<len_globas;++i){ //先处理函数外的全局变量
             int is_const = globas[i].is_const;
             out.write(reverseData((unsigned char *)&is_const, sizeof(char)), sizeof(char));
-            int var_len = 8; // 变量值的字节数为4字节
-            out.write(reverseData((unsigned char *)&var_len, sizeof(int)), sizeof(int)); // 变量值的长度
-            long long var_value = 0; // 全局变量初始都是0
-            out.write(reverseData((unsigned char *)&var_value, 8 * sizeof(char)), 8 * sizeof(char)); // 后续补充string类型
+            if(globas[i].is_string){ // string类型
+                int var_len = globas[i].GetValueString().length();
+                out.write(reverseData((unsigned char*)&var_len, sizeof(int)),
+                          sizeof(int));   // 字符串的长度
+                for(int j = 0; j<var_len;++j){
+                    char c = globas[i].GetValueString()[j];
+                    out.write(reverseData((unsigned char *)&c, sizeof(char)), sizeof(char));
+                }
+            } 
+            else {
+                int var_len = 8;  // 变量值的字节数为4字节
+                out.write(reverseData((unsigned char*)&var_len, sizeof(int)),
+                          sizeof(int));   // 变量值的长度
+                long long var_value = 0;  // 全局变量初始都是0
+                out.write(
+                    reverseData((unsigned char*)&var_value, 8 * sizeof(char)),
+                    8 * sizeof(char));  
+            }
         }
         for(int i =1; i<flist.size(); ++i){ // 函数也是全局变量
             bool funcIsConst = 0x01;
@@ -1175,7 +1189,28 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
         std::cout<<"println"<<std::endl;  (*cnt)++;
         flist.back()._instrucs.emplace_back(Instruction(0x58,0,false));
     
-    } else { // 剩下的都是print命令
+    } else if( t.GetValueString() == "putstr"){
+        if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+        auto str = next = nextToken(); 
+        if( !next.has_value() || next.value().GetType() != STRING) // 得是个STRING 词法分析时引号已经解决了
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+        next = nextToken(); 
+        if( !next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET)
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+
+        Token ss(str.value().GetType(), str.value().GetValueString());
+        ss.is_const = true; ss.is_string = true;
+        l.action_layer.front().symbols.emplace_back(ss); // STRING是一个全局常量
+        int pos = l.action_layer.front().symbols.size() - 1;
+        std::cout<<"globa "<<pos<<std::endl; (*cnt)++; // 加载到栈上  
+        flist.back()._instrucs.emplace_back(Instruction(0x0c,pos,true));
+        std::cout<<"load.64"<<std::endl; (*cnt)++;  // 加载STRING的值
+        flist.back()._instrucs.emplace_back(Instruction(0x13,0,false));
+        std::cout<<"print.s"<<std::endl;  (*cnt)++;
+        flist.back()._instrucs.emplace_back(Instruction(0x57,0,false));
+    } 
+    else { // 剩下的都是print命令
         if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
         auto err = Expression(cnt);
