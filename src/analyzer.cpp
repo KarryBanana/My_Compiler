@@ -15,7 +15,7 @@ int main_num = -1; // 用来记main函数的编号
 
 char* Analyzer::reverseData(unsigned char *num, int len)
 {
-    unsigned char *tmp = (unsigned char *)malloc(sizeof(num));
+    unsigned char *tmp = (unsigned char *)malloc(len * sizeof(char));
     for(int i = 0; i<len; ++i){
         tmp[i] = num[len - i - 1];
     }
@@ -115,11 +115,12 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
         std::vector<Token> globas = l.action_layer.front().symbols;
         int len_globas = globas.size();
         for(int i = 0;i<len_globas;++i){ //先处理函数外的全局变量
-            out.write(reverseData((unsigned char *)&globas[i].is_const, sizeof(bool)), sizeof(bool));
-            int var_len = 0x00000008; // 变量值的字节数为4字节
+            int is_const = globas[i].is_const;
+            out.write(reverseData((unsigned char *)&is_const, sizeof(char)), sizeof(char));
+            int var_len = 8; // 变量值的字节数为4字节
             out.write(reverseData((unsigned char *)&var_len, sizeof(int)), sizeof(int)); // 变量值的长度
-            long var_value = 0; // 全局变量初始都是0
-            out.write(reverseData((unsigned char *)&var_value, sizeof(long)), sizeof(long)); // 后续补充string类型
+            long long var_value = 0; // 全局变量初始都是0
+            out.write(reverseData((unsigned char *)&var_value, 8 * sizeof(char)), 8 * sizeof(char)); // 后续补充string类型
         }
         bool _startIsConst = 0x01;
         out.write(reverseData((unsigned char *)&_startIsConst, sizeof(bool)), sizeof(bool)); // _start是全局
@@ -127,6 +128,16 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
         out.write(reverseData((unsigned char *)&_startcnt, sizeof(int)), sizeof(int)); // 函数名长度
         char _start[] = "_start";
         out.write(_start, strlen(_start)); // _start函数名
+        for(int i =1; i<flist.size(); ++i){ // 剩下的函数也是全局变量
+            bool funcIsConst = 0x01;
+            out.write(reverseData((unsigned char *)&funcIsConst, sizeof(bool)), sizeof(bool));
+            int funcNameLen = flist[i].func_name.length();
+            out.write(reverseData((unsigned char *)&funcNameLen, sizeof(int)), sizeof(int)); // 函数名长度
+            for(int j = 0; j<funcNameLen;++j){
+                char c = flist[i].func_name[j];
+                out.write(reverseData((unsigned char *)&c, sizeof(char)), sizeof(char));
+            }
+        }
 
         int func_num = flist.size(); // 函数的个数 包括_start
         out.write(reverseData((unsigned char *)&func_num, sizeof(int)), sizeof(int));
@@ -145,10 +156,12 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
             unsigned char instrucNum = ins.ins_num;
             out.write(reverseData((unsigned char *)&instrucNum, sizeof(char)), sizeof(char));  // 指令数
             if (ins.has_op_num){
-                if(ins.ins_num == 0x01)
-                    out.write(reverseData((unsigned char *)&ins.op_num, sizeof(long)), sizeof(long)); // push操作数是8字节
+                long long op_num = ins.op_num;
+                if(ins.ins_num == 0x01){
+                    out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
+                }
                 else
-                    out.write(reverseData((unsigned char *)&ins.op_num, sizeof(int)), sizeof(int)); // 否则是4字节
+                    out.write(reverseData((unsigned char *)&op_num, sizeof(int)), sizeof(int)); // 否则是4字节
             }
         }
         for(int i = 1; i < flist.size(); ++i){ // 处理剩下的函数
@@ -170,14 +183,15 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                     reverseData((unsigned char*)&instrucNum, sizeof(char)),
                     sizeof(char));  // 指令数
                 if (ins.has_op_num) {
-                    if (ins.ins_num == 0x01)
-                        out.write(reverseData((unsigned char*)&ins.op_num,
-                                              sizeof(long)),
-                                  sizeof(long));  // push操作数是8字节
-                    else
-                        out.write(reverseData((unsigned char*)&ins.op_num,
-                                              sizeof(int)),
-                                  sizeof(int));  // 否则是4字节
+                    long long op_num = ins.op_num;
+                    if (ins.ins_num == 0x01) {
+                        out.write(reverseData((unsigned char*)&op_num,
+                                              sizeof(long long)),
+                                  sizeof(long long));  // push操作数是8字节
+                    } else
+                        out.write(
+                            reverseData((unsigned char*)&op_num, sizeof(int)),
+                            sizeof(int));  // 否则是4字节
                 }
             }
         }
