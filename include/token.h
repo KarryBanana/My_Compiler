@@ -51,6 +51,7 @@ public:
     is_initial(false),
     is_int(false),
     is_double(false),
+    is_string(false),
     off(0) {} // 默认没初始化 
 public:
     TokenType GetType() const { return _type; };
@@ -78,5 +79,6 @@ public:
     bool is_initial;
     bool is_int;
     bool is_double;
+    bool is_string;
     int off;
 };
