@@ -324,7 +324,6 @@ std::optional<CompilationError> Analyzer::Function()
     if( block_stmt.has_value() )
         // 报错
          return block_stmt;
-    std::cout<<"this func has "<<cnt<<std::endl; 
     if(flist.back().void_return)
         flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
     return {};
@@ -731,8 +730,8 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
     if( err.has_value() )
         return err;
     // 此处无条件跳转回到头
-    std::cout<<"br "<<-(*cnt - tmp) + 1<<std::endl;
-    flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt - tmp) + 1, true));
+    std::cout<<"br "<<-(*cnt + 1 - tmp)<<std::endl;
+    flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt  + 1 - tmp), true));
     (*cnt)++;
     std::cout<<"should br "<<*cnt - jump_while<<std::endl;
     flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_while;  // 把跳转的值填回去
@@ -808,7 +807,7 @@ std::optional<CompilationError> Analyzer::EqualExpr(int *cnt)
         return err;
     while( true ){
         auto next = nextToken();
-        std::cout<<next.value().GetType()<<std::endl;
+        // std::cout<<next.value().GetType()<<std::endl;
         if( !next.has_value() ){
             unreadToken();
             break;
@@ -885,7 +884,7 @@ std::optional<CompilationError> Analyzer::GreatExpr(int *cnt)
             break;
         }
         if( next.value().GetType() == TokenType:: PLUS_SIGN){
-            std::cout<<"+ + + +"<<std::endl;
+            // std::cout<<"+ + + +"<<std::endl;
             err = PlusExpr(cnt);
             if( err.has_value() ) return err;
             // add 两个数
@@ -898,7 +897,7 @@ std::optional<CompilationError> Analyzer::GreatExpr(int *cnt)
             (*cnt)++;
         }
         else if(next.value().GetType() == TokenType:: MINUS_SIGN ){
-            std::cout<<"- - - -"<<std::endl;
+            // std::cout<<"- - - -"<<std::endl;
             err = PlusExpr(cnt);
             if( err.has_value() ) return err;
             // sub 两个数
@@ -931,7 +930,7 @@ std::optional<CompilationError> Analyzer::PlusExpr(int *cnt)
             break;
         }
         else if(next.value().GetType() == TokenType:: MULTIPLICATION_SIGN ){
-            std::cout<<"multi multi multi"<<std::endl;
+            // std::cout<<"multi multi multi"<<std::endl;
             err = MultiExpr(cnt);
             if( err.has_value() ) return err;
             // multi 两个数
@@ -944,7 +943,7 @@ std::optional<CompilationError> Analyzer::PlusExpr(int *cnt)
             (*cnt)++;
         }
         else if(next.value().GetType() == TokenType::DIVISION_SIGN ){
-            std::cout<<"div div div"<<std::endl;
+            // std::cout<<"div div div"<<std::endl;
             err = MultiExpr(cnt);
             if( err.has_value() ) return err;
             // divide 两个数
@@ -1016,7 +1015,7 @@ std::optional<CompilationError> Analyzer::AsExpr(int *cnt)
 std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
 {
     auto next = nextToken();
-    std::cout<<"token type is "<<next.value().GetValueString()<<std::endl;
+    // std::cout<<"token type is "<<next.value().GetValueString()<<std::endl;
     if( next.value().GetType() == LEFT_BRACKET){
         auto err = BracketExpr(cnt);
         if(err.has_value()) return err;
@@ -1059,7 +1058,7 @@ std::optional<CompilationError> Analyzer::IdentExpr(int *cnt)
 {
     bool flag_const = false;
     auto tk = nextToken();
-    std::cout<<"now tk is :"<<tk.value().GetValueString()<<std::endl;
+    // std::cout<<"now tk is :"<<tk.value().GetValueString()<<std::endl;
     int idx = flist.back().getVarParams(tk.value(), &flag_const);
     if(idx == -1){
         idx = flist.back().getVarLocal(tk.value(), &flag_const);
