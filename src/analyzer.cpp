@@ -107,6 +107,12 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                 break;
         }
     }
+    for(int i = 1; i<flist.size(); ++i){
+        if(flist[i].func_name == "main"){
+            main_num = l.action_layer.front().symbols.size() -1 + i;
+            break;
+        }
+    }
     if(main_num == -1) // 没有找到main函数
         return std::make_optional<CompilationError>(ErrorCode::NoMain); 
     if(out.is_open()){ // 全局变量的个数为 globas + funcs + _start函数
@@ -273,8 +279,6 @@ std::optional<CompilationError> Analyzer::Function()
     if( !isFuncDuplic(idnt.value()) ) // 函数名重复
         return std::make_optional<CompilationError>(ErrorCode::DuplicateFunc);
     flist.back().func_name = idnt.value().GetValueString();
-    if(idnt.value().GetValueString() == "main") // 看看是不是main函数
-        main_num = flist.size() - 1; // main函数编号
     
     // std::cout<<"function name"<<std::endl;
     // (
@@ -1203,10 +1207,8 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
         ss.is_const = true; ss.is_string = true;
         l.action_layer.front().symbols.emplace_back(ss); // STRING是一个全局常量
         int pos = l.action_layer.front().symbols.size() - 1;
-        std::cout<<"globa "<<pos<<std::endl; (*cnt)++; // 加载到栈上  
-        flist.back()._instrucs.emplace_back(Instruction(0x0c,pos,true));
-        std::cout<<"load.64"<<std::endl; (*cnt)++;  // 加载STRING的值
-        flist.back()._instrucs.emplace_back(Instruction(0x13,0,false));
+        std::cout<<"push "<<pos<<std::endl; (*cnt)++; // 加载到栈上  
+        flist.back()._instrucs.emplace_back(Instruction(0x01,pos,true));
         std::cout<<"print.s"<<std::endl;  (*cnt)++;
         flist.back()._instrucs.emplace_back(Instruction(0x57,0,false));
     } 
