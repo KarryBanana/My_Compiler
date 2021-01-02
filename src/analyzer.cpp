@@ -122,13 +122,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
             long long var_value = 0; // 全局变量初始都是0
             out.write(reverseData((unsigned char *)&var_value, 8 * sizeof(char)), 8 * sizeof(char)); // 后续补充string类型
         }
-        bool _startIsConst = 0x01;
-        out.write(reverseData((unsigned char *)&_startIsConst, sizeof(bool)), sizeof(bool)); // _start是全局
-        int _startcnt = 0x06;
-        out.write(reverseData((unsigned char *)&_startcnt, sizeof(int)), sizeof(int)); // 函数名长度
-        char _start[] = "_start";
-        out.write(_start, strlen(_start)); // _start函数名
-        for(int i =1; i<flist.size(); ++i){ // 剩下的函数也是全局变量
+        for(int i =1; i<flist.size(); ++i){ // 函数也是全局变量
             bool funcIsConst = 0x01;
             out.write(reverseData((unsigned char *)&funcIsConst, sizeof(bool)), sizeof(bool));
             int funcNameLen = flist[i].func_name.length();
@@ -138,20 +132,27 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                 out.write(reverseData((unsigned char *)&c, sizeof(char)), sizeof(char));
             }
         }
+        bool _startIsConst = 0x01; // 处理_start
+        out.write(reverseData((unsigned char *)&_startIsConst, sizeof(bool)), sizeof(bool)); // _start是全局
+        int _startcnt = 0x06;
+        out.write(reverseData((unsigned char *)&_startcnt, sizeof(int)), sizeof(int)); // 函数名长度
+        char _start[] = "_start";
+        out.write(_start, strlen(_start)); // _start函数名
 
         int func_num = flist.size(); // 函数的个数 包括_start
         out.write(reverseData((unsigned char *)&func_num, sizeof(int)), sizeof(int));
 
-        int _startIdx = globas.size(); // _start在全局变量中的位置
+        int _startIdx = globa_num - 1; // _start在全局变量中的位置
         out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int));
         int _startReturn = 0;
         out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无return
         out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无params 因为值都是0，就偷懒了
         out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无局部变量
-        int _startInstruc = flist.front()._instrucs.size();  // _start中的指令个数
-        out.write(reverseData((unsigned char *)&_startInstruc, sizeof(int)), sizeof(int));
+        int _startInstrucNoCall = flist.front()._instrucs.size();  // _start中的指令个数 没算call main
+        int _startCall = _startInstrucNoCall + 1;  // 添加一条call main的指令
+        out.write(reverseData((unsigned char *)&_startCall, sizeof(int)), sizeof(int));
         // //std::cout<<"_start has "<<_startFuncInstruc<<" instrus"<<std::endl;
-        for (int i = 0; i < _startInstruc; ++i) { // _start具体指令
+        for (int i = 0; i < _startInstrucNoCall; ++i) { // _start具体指令
             Instruction ins = flist.front()._instrucs[i];
             unsigned char instrucNum = ins.ins_num;
             out.write(reverseData((unsigned char *)&instrucNum, sizeof(char)), sizeof(char));  // 指令数
@@ -164,8 +165,11 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                     out.write(reverseData((unsigned char *)&op_num, sizeof(int)), sizeof(int)); // 否则是4字节
             }
         }
+        char ins_call = 0x48; // _start结尾要call main
+        out.write(reverseData((unsigned char *)&ins_call, sizeof(char)), sizeof(char));
+        out.write(reverseData((unsigned char *)&main_num, sizeof(int)), sizeof(int)); // main函数的编号
         for(int i = 1; i < flist.size(); ++i){ // 处理剩下的函数
-            int funcIdx = globas.size() + i; // 函数在全局变量中的位置
+            int funcIdx = globas.size() + i - 1; // 函数在全局变量中的位置
             out.write(reverseData((unsigned char *)&funcIdx, sizeof(int)), sizeof(int));
             int func_return = !flist[i].void_return;  // 函数return 是void还是非void
             out.write(reverseData((unsigned char *)&func_return, sizeof(int)), sizeof(int));
