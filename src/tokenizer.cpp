@@ -240,6 +240,7 @@ Tokenizer::nextToken()
         break;
       }
       auto ch = current_char.value();
+      std::cout<<"current string is------------"<<ch<<std::endl;
       if (ch != '"' && ch != '\\')
         ss << ch;
       else if (ch == '\\')
@@ -247,8 +248,8 @@ Tokenizer::nextToken()
         auto ch_peek = nextChar();
         if (ch_peek == '\\' || '\'' || '"' || 'n' || 'r' || 't')
         { //peek一下，没有问题就回退
-          unreadLast();
           ss << ch; //没问题，读入
+          ss << ch_peek.value(); 
         }
         else
         {
