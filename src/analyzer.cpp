@@ -52,9 +52,8 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
     }
     int magic = 0x72303b3e;
     int version = 0x00000001;
-    out.write(reverseData((unsigned char *)&magic, sizeof(magic)), sizeof(magic)); // magic
-    out.write(reverseData((unsigned char *)&version, sizeof(version)), sizeof(version)); // version
-
+    out.write(reverseData((unsigned char *)&magic, sizeof(int)), sizeof(int)); // magic
+    out.write(reverseData((unsigned char *)&version, sizeof(int)), sizeof(int)); // version
     int tmp = 0; int *cnt = &tmp;
     while(true){
         // 预读一个token,看看是不是声明语句
@@ -136,8 +135,8 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
         out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int));
         int _startReturn = 0;
         out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无return
-        out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int)); // _start无params 因为值都是0，就偷懒了
-        out.write(reverseData((unsigned char *)&_startIdx, sizeof(int)), sizeof(int)); // _start无局部变量
+        out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无params 因为值都是0，就偷懒了
+        out.write(reverseData((unsigned char *)&_startReturn, sizeof(int)), sizeof(int)); // _start无局部变量
         int _startInstruc = flist.front()._instrucs.size();  // _start中的指令个数
         out.write(reverseData((unsigned char *)&_startInstruc, sizeof(int)), sizeof(int));
         // //std::cout<<"_start has "<<_startFuncInstruc<<" instrus"<<std::endl;
@@ -183,7 +182,6 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
             }
         }
     } 
-    out.close();
     return {};
 }
 
