@@ -306,7 +306,8 @@ std::optional<CompilationError> Analyzer::Function()
         // 报错
          return block_stmt;
     std::cout<<"this func has "<<cnt<<std::endl; 
-    
+    if(flist.back().void_return)
+        flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
     return {};
 }
 
@@ -950,7 +951,7 @@ std::optional<CompilationError> Analyzer::MultiExpr(int *cnt)
     auto err = AsExpr(cnt);
     if( err.has_value() )
         return err;
-    std::cout<<"1111111"<<std::endl;
+    //std::cout<<"1111111"<<std::endl;
     while (true) {
         auto next = nextToken();
         if( !next.has_value() ){
@@ -1339,7 +1340,7 @@ bool Stack::checkTopNum()
 void Stack::pushItem(StackItem item)
 {
     s._stack.emplace_back(item);
-    std::cout<<"stack size : "<<s._stack.size()<<std::endl;
+    //std::cout<<"stack size : "<<s._stack.size()<<std::endl;
     return ;
 }
 
