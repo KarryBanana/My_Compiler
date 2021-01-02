@@ -260,7 +260,7 @@ Tokenizer::nextToken()
       else if (ch == '"')
       { // 结束了
         std::string str;
-        ss >> str;
+        str = ss.str();
         int len = str.length();
         str = str.substr(1, len - 1);
         ss.clear();
