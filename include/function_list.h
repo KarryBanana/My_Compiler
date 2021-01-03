@@ -10,6 +10,7 @@ class FunctionList{
     int getVarParams(Token t, bool *flag_const);
     int getVarLocal(Token t, bool *flag_const);
     int getVarGloba(Token t, bool *flag_const);
+    int getFuncIdx(std::string name);
   
   public:
     bool void_return; // 是否是void return
