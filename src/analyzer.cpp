@@ -1020,12 +1020,25 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         auto err = BracketExpr(cnt);
         if(err.has_value()) return err;
     } else if(next.value().GetType() == IDENTIFIER){
+        auto callname = next.value().GetValueString(); // 如果是函数调用的话，保存下函数名
         // 函数调用 或者 变量
         next = nextToken();
         unreadToken();
         if( next.value().GetType() == TokenType::LEFT_BRACKET){
-            auto err = CallExpr(cnt);
+            int callFuncIdx = flist.back().getFuncIdx(callname); // 随便用一个函数调用getFuncIdx
+            if( callFuncIdx == -1) // 找不到报错
+                return std::make_optional<CompilationError>(ErrorCode::FuncNotExist);
+            std::cout<<"call "<<callFuncIdx<<std::endl; (*cnt)++;
+            flist.back()._instrucs.emplace_back(Instruction(0x48, callFuncIdx, true));
+            std::cout<<"stackalloc "<<1<<std::endl; (*cnt)++; // 留一个空间给返回值 
+            flist.back()._instrucs.emplace_back(Instruction(0x1a, 1, true));
+            auto err = CallExpr(cnt); // 放置参数
             if(err.has_value()) return err;
+            std::vector<Instruction> callInstrucs = flist[callFuncIdx]._instrucs;
+            for(int i = 0;i<callInstrucs.size(); ++i){ //把调用的函数的指令全部装进去
+                flist.back()._instrucs.emplace_back(callInstrucs[i]);
+            }
+            (*cnt) += callInstrucs.size(); //加了这么多条指令
         }else{
             unreadToken();
             auto err = IdentExpr(cnt);
@@ -1356,6 +1369,15 @@ int FunctionList::getVarGloba(Token t, bool *flag_const) {
     return -1;
 }
 
+int FunctionList::getFuncIdx(std::string name)
+{
+    int func_len = flist.size();
+    for(int i = 1; i< func_len; ++i){ // flis[0]是_start
+        if(flist[i].func_name == name)
+            return i;
+    }
+    return -1;
+}
 bool Stack::checkAssign()
 {
     StackItem top = s._stack.back();
