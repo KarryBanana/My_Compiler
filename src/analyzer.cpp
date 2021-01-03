@@ -772,6 +772,8 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
     if( !next.has_value() || next.value().GetType() != TokenType::SEMICOLON )
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    std::cout<<"ret"<<std::endl; (*cnt++);
+    flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
     return {};
 }
 // 空代码块
@@ -1039,8 +1041,6 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
             int callFuncIdx = flist.back().getFuncIdx(callname); // 随便用一个函数调用getFuncIdx
             if( callFuncIdx == -1) // 找不到报错
                 return std::make_optional<CompilationError>(ErrorCode::FuncNotExist);
-            std::cout<<"call "<<callFuncIdx<<std::endl; (*cnt)++;
-            flist.back()._instrucs.emplace_back(Instruction(0x48, callFuncIdx, true));
             if (!flist[callFuncIdx].void_return) { // 如果是int 返回值才预留return 空间
                 std::cout << "stackalloc " << 1 << std::endl; (*cnt)++; // 留一个空间给返回值
                 s.pushItem(INT_NUM);  // 栈上放一个返回的return 值
@@ -1048,7 +1048,9 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
             }
             auto err = CallExpr(cnt); // 放置参数
             if(err.has_value()) return err;
-        
+            std::cout << "call " << callFuncIdx << std::endl; (*cnt)++;
+            flist.back()._instrucs.emplace_back(
+                Instruction(0x48, callFuncIdx, true));
             std::vector<Instruction> callInstrucs = flist[callFuncIdx]._instrucs;
             for(int i = 0;i<callInstrucs.size(); ++i){ //把调用的函数的指令全部装进去
                 flist.back()._instrucs.emplace_back(callInstrucs[i]);
