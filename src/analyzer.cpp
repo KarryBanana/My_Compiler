@@ -1052,10 +1052,7 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
             flist.back()._instrucs.emplace_back(
                 Instruction(0x48, callFuncIdx, true));
             std::vector<Instruction> callInstrucs = flist[callFuncIdx]._instrucs;
-            for(int i = 0;i<callInstrucs.size(); ++i){ //把调用的函数的指令全部装进去
-                flist.back()._instrucs.emplace_back(callInstrucs[i]);
-            }
-            (*cnt) += callInstrucs.size(); //加了这么多条指令
+            std::cout<<"callee has --------"<<callInstrucs.size()<<std::endl;
             s.popItem(); s.popItem(); // 调用完参数也就没了
         }else{
             unreadToken();
