@@ -680,6 +680,7 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
         }
         if(next.value().GetType() == TokenType::L_BRACE){
+            unreadToken();
             err = BlockStatement(cnt);
             if( err.has_value() )
                 return err;
@@ -745,10 +746,15 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
     if( !next.has_value() || next.value().GetType() != TokenType::RETURN )
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    if (!flist.back().void_return) {  // 先加载arga0 的地址
+        std::cout << "arga 0" << std::endl;
+        (*cnt)++;
+        flist.back()._instrucs.emplace_back(Instruction(0x0b, 0, true));
+    }
     while(true){
         next = nextToken();
+        unreadToken();
         if( next.value().GetType() == TokenType::SEMICOLON){
-            unreadToken();
             break;
         }else{
             auto err = Expression(cnt);
@@ -757,6 +763,11 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
         }
     }
     next = nextToken();
+    if (!flist.back().void_return) {  // 如果有返回值,store到arga0里
+        std::cout << "store.64" << std::endl;
+        (*cnt)++;
+        flist.back()._instrucs.emplace_back(Instruction(0x17, 0, false));
+    }
     // ;
     if( !next.has_value() || next.value().GetType() != TokenType::SEMICOLON )
         // 报错
@@ -1006,8 +1017,8 @@ std::optional<CompilationError> Analyzer::AsExpr(int *cnt)
         return err;
         
     if(neg_cnt){ // 前面有奇数个负号, 将栈顶取反
-        std::cout<<"neg.i"<<std::endl;
-        (*cnt)++;
+        std::cout<<"neg.i"<<std::endl; (*cnt)++;
+        flist.back()._instrucs.emplace_back(Instruction(0x34,0,false));
     }
     return {};
 }
@@ -1030,15 +1041,20 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
                 return std::make_optional<CompilationError>(ErrorCode::FuncNotExist);
             std::cout<<"call "<<callFuncIdx<<std::endl; (*cnt)++;
             flist.back()._instrucs.emplace_back(Instruction(0x48, callFuncIdx, true));
-            std::cout<<"stackalloc "<<1<<std::endl; (*cnt)++; // 留一个空间给返回值 
-            flist.back()._instrucs.emplace_back(Instruction(0x1a, 1, true));
+            if (!flist[callFuncIdx].void_return) { // 如果是int 返回值才预留return 空间
+                std::cout << "stackalloc " << 1 << std::endl; (*cnt)++; // 留一个空间给返回值
+                s.pushItem(INT_NUM);  // 栈上放一个返回的return 值
+                flist.back()._instrucs.emplace_back(Instruction(0x1a, 1, true));
+            }
             auto err = CallExpr(cnt); // 放置参数
             if(err.has_value()) return err;
+        
             std::vector<Instruction> callInstrucs = flist[callFuncIdx]._instrucs;
             for(int i = 0;i<callInstrucs.size(); ++i){ //把调用的函数的指令全部装进去
                 flist.back()._instrucs.emplace_back(callInstrucs[i]);
             }
             (*cnt) += callInstrucs.size(); //加了这么多条指令
+            s.popItem(); s.popItem(); // 调用完参数也就没了
         }else{
             unreadToken();
             auto err = IdentExpr(cnt);
@@ -1093,6 +1109,8 @@ std::optional<CompilationError> Analyzer::IdentExpr(int *cnt)
             s.pushItem(ADDR);
         }
     } else {
+        if(!flist.back().void_return) // 如果是int类型函数,参数位置往后挪一个留给return 
+            idx++;
         std::cout<<"arga "<<idx<<std::endl; // 加载函数参数地址入栈
         flist.back()._instrucs.emplace_back(Instruction(0x0b,idx,true));
         (*cnt)++;
@@ -1128,6 +1146,7 @@ std::optional<CompilationError> Analyzer::CallExpr(int *cnt)
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     }
     if (next.value().GetType() != TokenType::RIGHT_BRACKET){
+        unreadToken();
         auto err = Expression(cnt);
         if( err.has_value() )   return err;
         while(true){
@@ -1146,10 +1165,9 @@ std::optional<CompilationError> Analyzer::CallExpr(int *cnt)
     }
     // 处理 )
     next = nextToken();
-    if(!next.has_value() || next.value().GetType() != RIGHT_BRACKET){
+    if(!next.has_value() || next.value().GetType() != RIGHT_BRACKET)
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-    }
     return {};
 }
 
