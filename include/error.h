@@ -21,6 +21,7 @@ enum ErrorCode{
   VoidVar,
   NoMain,
   CanNotCompare,
+  FuncNotExist,
 };
 
 class CompilationError {
