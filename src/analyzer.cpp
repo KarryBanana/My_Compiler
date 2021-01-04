@@ -747,8 +747,8 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     if (!flist.back().void_return) {  // 先加载arga0 的地址
-        std::cout << "arga 0" << std::endl;
-        (*cnt)++;
+        std::cout << "arga 0" << std::endl; (*cnt)++;
+        s.pushItem(ADDR);
         flist.back()._instrucs.emplace_back(Instruction(0x0b, 0, true));
     }
     while(true){
@@ -764,8 +764,8 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
     }
     next = nextToken();
     if (!flist.back().void_return) {  // 如果有返回值,store到arga0里
-        std::cout << "store.64" << std::endl;
-        (*cnt)++;
+        std::cout << "store.64" << std::endl; (*cnt)++;
+        s.popItem(); s.popItem();
         flist.back()._instrucs.emplace_back(Instruction(0x17, 0, false));
     }
     // ;
@@ -1053,7 +1053,8 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
                 Instruction(0x48, callFuncIdx, true));
             std::vector<Instruction> callInstrucs = flist[callFuncIdx]._instrucs;
             std::cout<<"callee has --------"<<callInstrucs.size()<<std::endl;
-            s.popItem(); s.popItem(); // 调用完参数也就没了
+            for(int i= 0; i<flist[callFuncIdx]._params.size(); ++i) // 弹出参数
+                s.popItem(); 
         }else{
             unreadToken();
             auto err = IdentExpr(cnt);
