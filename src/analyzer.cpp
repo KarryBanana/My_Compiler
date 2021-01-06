@@ -470,7 +470,6 @@ std::optional<CompilationError> Analyzer::BlockStatement(int *cnt)
 
     /*读到一个} 弹出一层   注意0弹出可能报错*/
     l.action_layer.pop_back();
-    std::cout<<"this block has "<<*cnt - tmp <<std::endl;
     return {};
 }
 // 表达式语句
@@ -684,6 +683,7 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
         (*cnt)++;
     }
     int jump_if = *cnt;
+    std::cout<<"before if block "<<jump_if<<std::endl;
     // block_stmt
     err = BlockStatement(cnt);
     if ( err.has_value() ) return err;
@@ -710,12 +710,13 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
             if( err.has_value() )  return err;
         }else
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput); // 报错 
-        std::cout<<"if br "<<*cnt - jump_else<<std::endl; // if执行完要跳过的else块
-        flist.back()._instrucs[jump_ins_else].op_num = *cnt - jump_else;  // 把跳转的值填回去
     }
     else{
         unreadToken();
     }
+    std::cout<<"here cnt is "<<*cnt<<std::endl;
+    std::cout<<"if br "<<*cnt - jump_else<<std::endl; // if执行完要跳过的else块
+    flist.back()._instrucs[jump_ins_else].op_num = *cnt - jump_else;  // 把跳转的值填回去
     return {};
 }
 // while
@@ -728,9 +729,9 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     // expr
+    cmp = 0; // 先默认是br.false
     auto err = Expression(cnt);
-    if( err.has_value() )
-        return err;
+    if( err.has_value() )  return err;
     if( !s.checkTopNum() )
         return std::make_optional<CompilationError>(ErrorCode::CanNotCompare);
     int jump_ins_idx = flist.back()._instrucs.size();
@@ -751,9 +752,9 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
     if( err.has_value() )
         return err;
     // 此处无条件跳转回到头
-    std::cout<<"br "<<-(*cnt + 1 - tmp)<<std::endl;
-    flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt  + 1 - tmp), true));
     (*cnt)++;
+    std::cout<<"br "<<-(*cnt - tmp)<<std::endl;
+    flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt - tmp), true));
     std::cout<<"should br "<<*cnt - jump_while<<std::endl;
     flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_while;  // 把跳转的值填回去
     return {}; 
@@ -792,7 +793,7 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
     if( !next.has_value() || next.value().GetType() != TokenType::SEMICOLON )
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-    std::cout<<"ret"<<std::endl; (*cnt++);
+    std::cout<<"ret"<<std::endl; (*cnt)++;
     flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
     return {};
 }
