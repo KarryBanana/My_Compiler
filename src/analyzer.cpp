@@ -668,30 +668,49 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
     auto err = Expression(cnt);
     if( err.has_value() )
         return err;
+    if( !s.checkTopNum() )
+        return std::make_optional<CompilationError>(ErrorCode::CanNotCompare);
+    int jump_ins_idx = flist.back()._instrucs.size();
+    // 此处可以获得跳转指令的位置
+    if(cmp == -1 || cmp == 0){
+        std::cout<<"br.false"<<std::endl;
+        flist.back()._instrucs.emplace_back(Instruction(0x42,0,true));
+        (*cnt)++;
+    }
+    if(cmp == 1){
+        std::cout<<"br.true"<<std::endl;
+        flist.back()._instrucs.emplace_back(Instruction(0x43,0,true));
+        (*cnt)++;
+    }
+    int jump_if = *cnt;
     // block_stmt
     err = BlockStatement(cnt);
-    if ( err.has_value() )
-        return err;
+    if ( err.has_value() ) return err;
+    std::cout<<"br else"<<std::endl; (*cnt)++;
+    int jump_else = *cnt; //执行完if块里的代码准备跳过所有else块
+    int jump_ins_else = flist.back()._instrucs.size(); // 准备br else的指令的位置
+    flist.back()._instrucs.emplace_back(Instruction(0x41,0, true)); 
+    
+    std::cout<<"if false br "<<*cnt - jump_if<<std::endl;
+    flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_if;  // 把跳转的值填回去
+
     next = nextToken();
     if( next.value().GetType() == TokenType::ELSE){
         next = nextToken();
-        if( !next.has_value() ){
+        unreadToken();
+        if( !next.has_value() )
             // 报错
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-        }
         if(next.value().GetType() == TokenType::L_BRACE){
-            unreadToken();
             err = BlockStatement(cnt);
-            if( err.has_value() )
-                return err;
+            if( err.has_value() ) return err;
         } else if( next.value().GetType() == TokenType:: IF){
             err = IfStatement(cnt);
-            if( err.has_value() )
-                return err;
-        }else{
-            // 报错
-            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-        }
+            if( err.has_value() )  return err;
+        }else
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput); // 报错 
+        std::cout<<"if br "<<*cnt - jump_else<<std::endl; // if执行完要跳过的else块
+        flist.back()._instrucs[jump_ins_else].op_num = *cnt - jump_else;  // 把跳转的值填回去
     }
     else{
         unreadToken();
