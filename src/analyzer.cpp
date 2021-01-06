@@ -664,6 +664,7 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
     if( !next.has_value() || next.value().GetType() != TokenType::IF )
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    cmp = 0; // 先默认br.false
     // expr
     auto err = Expression(cnt);
     if( err.has_value() )
@@ -865,7 +866,6 @@ std::optional<CompilationError> Analyzer::EqualExpr(int *cnt)
         else if(next.value().GetType() == TokenType:: GE ){
             err = GreatExpr(cnt); 
             if( err.has_value() ) return err;
-
             s.cmpInt();  // 后续添加比较浮点数
             s.setLess();
             cmp = 1; // br.true
@@ -874,7 +874,6 @@ std::optional<CompilationError> Analyzer::EqualExpr(int *cnt)
         else if(next.value().GetType() == TokenType:: LE  ){
             err = GreatExpr(cnt); 
             if( err.has_value() ) return err;
-
             s.cmpInt();  // 后续添加比较浮点数
             s.setGreat();
             cmp = 1; // br.true
