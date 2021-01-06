@@ -240,7 +240,6 @@ Tokenizer::nextToken()
         break;
       }
       auto ch = current_char.value();
-      std::cout<<"current string is------------"<<ch<<std::endl;
       if (ch != '"' && ch != '\\')
         ss << ch;
       else if (ch == '\\')
@@ -589,7 +588,7 @@ Tokenizer::nextToken()
       std::string str;
       ss >> str;
       ss.clear();
-      return std::make_pair(std::make_optional<Token>(TokenType::GT,
+      return std::make_pair(std::make_optional<Token>(TokenType::GE,
                                                       str),
                             std::optional<CompilationError>());
       break;
