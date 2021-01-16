@@ -43,6 +43,10 @@ class Analyzer {
     std::optional<CompilationError> IfStatement(int *cnt);
     //while
     std::optional<CompilationError> WhileStatement(int *cnt);
+    // break
+    std::optional<CompilationError> BreakStatement(int *cnt);
+    // continue
+    std::optional<CompilationError> ContinueStatement(int *cnt);
     // return 
     std::optional<CompilationError> ReturnStatement(int *cnt);
     // 空代码块
