@@ -5,13 +5,17 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <stack>
 
 
 Stack s; // 模拟栈
+std::stack<int> stackBreak; // 保存break
+std::stack<int> stackConti; // 保存continue
 std::vector<FunctionList> flist; // 函数列表
 Layer l;
 int cmp = 0; // 用来区分 br.true 和 br.false
 int main_num = -1; // 用来记main函数的编号
+int layerWhile = 0; // 判断break continue是否在while里面
 
 char* Analyzer::reverseData(unsigned char *num, int len)
 {
@@ -418,6 +422,14 @@ std::optional<CompilationError> Analyzer::Statement(int *cnt)
         auto err = WhileStatement(cnt);
         if(err.has_value()) return err; 
     }
+    else if(tmp == BREAK){
+        auto err = BreakStatement(cnt);
+        if(err.has_value()) return err; 
+    }
+    else if(tmp == CONTINUE){
+        auto err = ContinueStatement(cnt);
+        if(err.has_value()) return err; 
+    }
     else if(tmp == RETURN){
         auto err = ReturnStatement(cnt);
         if(err.has_value()) return err; 
@@ -746,18 +758,76 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
         flist.back()._instrucs.emplace_back(Instruction(0x43,0,true));
         (*cnt)++;
     }
+    layerWhile++; // while层数+1
     int jump_while = *cnt;
     // block_stmt
     err = BlockStatement(cnt);
     if( err.has_value() )
         return err;
     // 此处无条件跳转回到头
+    layerWhile--; // 结束一个while层
     (*cnt)++;
     std::cout<<"br "<<-(*cnt - tmp)<<std::endl;
     flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt - tmp), true));
     std::cout<<"should br "<<*cnt - jump_while<<std::endl;
     flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_while;  // 把跳转的值填回去
+    while(!stackBreak.empty()){
+        int pos = stackBreak.top();
+        stackBreak.pop();
+        int jump_break = stackBreak.top();
+        stackBreak.pop();
+        flist.back()._instrucs[pos].op_num = *cnt - jump_break;
+        std::cout<<"br break "<<*cnt - jump_break<<std::endl;
+    }
+    while (!stackConti.empty()) {
+        int pos = stackConti.top();
+        stackConti.pop();
+        int jump_conti = stackConti.top();
+        stackConti.pop();
+        flist.back()._instrucs[pos].op_num = *cnt - jump_conti;
+        std::cout<<"br continue "<<*cnt - jump_conti<<std::endl;
+    }
     return {}; 
+}
+// break
+std::optional<CompilationError> Analyzer::BreakStatement(int *cnt)
+{
+    // break
+    auto next = nextToken();
+    if(!next.has_value() || next.value().GetType() != TokenType::BREAK)
+        return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    if(!layerWhile) // 不存在while
+        return std::make_optional<CompilationError>(ErrorCode::CanNotBreak);
+    // ;
+    next = nextToken();
+    if(!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+        return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    // 跳转指令
+    std::cout<<"br "<<std::endl; (*cnt)++;
+    stackBreak.push(*cnt); // 记录指令
+    stackBreak.push(flist.back()._instrucs.size()); // 保存break指令的位置
+    flist.back()._instrucs.emplace_back(Instruction(0x41,0,true)); 
+    return {};
+}
+// continue
+std::optional<CompilationError> Analyzer::ContinueStatement(int *cnt)
+{
+    // continue
+    auto next = nextToken();
+    if(!next.has_value() || next.value().GetType() != TokenType::CONTINUE)
+        return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    if(!layerWhile) // 不存在while
+        return std::make_optional<CompilationError>(ErrorCode::CanNotContinue);
+    // ;
+    next = nextToken();
+    if(!next.has_value() || next.value().GetType() != TokenType::SEMICOLON)
+        return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+    // 跳转指令
+    std::cout<<"br "<<std::endl; (*cnt)++;
+    stackConti.push(*cnt); // 记录指令
+    stackConti.push(flist.back()._instrucs.size()); // 保存break指令的位置
+    flist.back()._instrucs.emplace_back(Instruction(0x41,0,true)); 
+    return {};
 }
 // return 
 std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
