@@ -8,6 +8,7 @@ enum TokenType {
   NULL_TOKEN,
   UNSIGNED_INTEGER,
   STRING, // 字符串
+  CHAR, // 字符
   IDENTIFIER,
   STDIO, // 标准输入输出
   FN,
