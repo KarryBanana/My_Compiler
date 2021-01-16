@@ -247,8 +247,18 @@ Tokenizer::nextToken()
         auto ch_peek = nextChar();
         if (ch_peek == '\\' || '\'' || '"' || 'n' || 'r' || 't')
         { //peek一下，没有问题就回退
-          ss << ch; //没问题，读入
-          ss << ch_peek.value(); 
+          if(ch_peek == '\\')
+            ss << "\\";
+          else if(ch_peek == '\'')
+            ss << "\'";
+          else if(ch_peek == '"')
+            ss << "\"";
+          else if(ch_peek == 'n')
+            ss << '\n';
+          else if(ch_peek == 'r')
+            ss << '\r';
+          else if(ch_peek == 't')
+            ss << '\t';
         }
         else
         {
