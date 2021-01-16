@@ -159,6 +159,9 @@ Tokenizer::nextToken()
         case '"':
           current_state = DFAState::STRING_STATE;
           break;
+        case '\'':
+          current_state = DFAState::CHAR_STATE;
+          break;
         case ',':
           current_state = DFAState::COMA_STATE;
           break;
@@ -276,6 +279,52 @@ Tokenizer::nextToken()
         ss.clear();
         return std::make_pair(std::make_optional<Token>(TokenType::STRING,
                                                         str),
+                              std::optional<CompilationError>());
+      }
+      break;
+    }
+    case CHAR_STATE:
+    {
+      char c;
+      if (!current_char.has_value())
+      { // 字符串常量不允许读到行末尾还未结束
+        return std::make_pair(std::optional<Token>(),
+                              std::make_optional<CompilationError>(ErrorCode::InvalidInput));
+        break;
+      }
+      auto ch = current_char.value();
+      if (ch != '\'' && ch != '\\')
+        c = ch + '\0';
+      else if (ch == '\\')
+      { //出现
+        auto ch_peek = nextChar();
+        if (ch_peek == '\\' || '\'' || '"' || 'n' || 'r' || 't')
+        { //peek一下，没有问题就回退
+          if(ch_peek == '\\')
+            c = '\\';
+          else if(ch_peek == '\'')
+            c = '\'';
+          else if(ch_peek == '"')
+            c = '\"';
+          else if(ch_peek == 'n')
+            c = '\n';
+          else if(ch_peek == 'r')
+            c = '\r';
+          else if(ch_peek == 't')
+            c = '\t';
+        }
+        else
+        {
+          unreadLast(); //出现了其他字符
+          return std::make_pair(std::optional<Token>(),
+                                std::make_optional<CompilationError>(ErrorCode::InvalidInput));
+        }
+      }
+      else if (ch == '\'')
+      { // 结束了
+        std::cout<<"i read a char: "<<c<<std::endl;
+        return std::make_pair(std::make_optional<Token>(TokenType::CHAR,
+                                                        c),
                               std::optional<CompilationError>());
       }
       break;
