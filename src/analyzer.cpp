@@ -695,7 +695,6 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
         (*cnt)++;
     }
     int jump_if = *cnt;
-    std::cout<<"before if block "<<jump_if<<std::endl;
     // block_stmt
     err = BlockStatement(cnt);
     if ( err.has_value() ) return err;
@@ -726,7 +725,6 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
     else{
         unreadToken();
     }
-    std::cout<<"here cnt is "<<*cnt<<std::endl;
     std::cout<<"if br "<<*cnt - jump_else<<std::endl; // if执行完要跳过的else块
     flist.back()._instrucs[jump_ins_else].op_num = *cnt - jump_else;  // 把跳转的值填回去
     return {};
@@ -784,8 +782,8 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
         stackConti.pop();
         int jump_conti = stackConti.top();
         stackConti.pop();
-        flist.back()._instrucs[pos].op_num = *cnt - jump_conti;
-        std::cout<<"br continue "<<*cnt - jump_conti<<std::endl;
+        flist.back()._instrucs[pos].op_num = -(jump_conti - tmp);
+        std::cout<<"br continue "<<-(jump_conti - tmp)<<std::endl;
     }
     return {}; 
 }
@@ -1272,7 +1270,6 @@ std::optional<CompilationError> Analyzer::BracketExpr(int *cnt)
         //报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     }
-    std::cout<<")))))))"<<std::endl;
     return {};
 }
 // 标准输入输出IO
