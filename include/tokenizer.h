@@ -23,6 +23,7 @@ class Tokenizer {
     HALF_NEQ_STATE, // 只读入了一个!的状态
     NEQ_SIGN_STATE, // !=
     STRING_STATE, // 字符串常量
+    CHAR_STATE, // 字符常量
     LT_STATE, // <
     GT_STATE, // >
     LE_STATE, // <=
