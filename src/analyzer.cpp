@@ -354,20 +354,17 @@ std::optional<CompilationError> Analyzer::FunctionParamList()
 // function_param 函数参数
 std::optional<CompilationError> Analyzer::FunctionParam() 
 {
+    bool constFlag = false;
     auto next = nextToken();
     if( !next.has_value())
         // 报错
          return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     if( next.value().GetType() == TokenType::CONST){
         // 常量声明操作blablabla
-        next = nextToken();
         std::cout<<"param const"<<std::endl;
-        // 添加到函数列表的参数数组中
-        Token p(next.value().GetType(), next.value().GetValueString() );
-        p.is_const = true;
-        flist.back()._params.emplace_back(p);
+        constFlag = true;
+        next = nextToken();
     }
-    
     if(next.value().GetType() != TokenType::IDENTIFIER)
         // 报错
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
@@ -375,6 +372,8 @@ std::optional<CompilationError> Analyzer::FunctionParam()
      // 添加到函数列表的参数数组中
     Token p(next.value().GetType(), next.value().GetValueString() );
     flist.back()._params.emplace_back(p);
+    if(constFlag)
+        flist.back()._params.back().is_const = true;
 
     for(int i = 0;i<flist.back()._params.size(); ++i){
         std::cout<<"params has "<<flist.back()._params[i].GetValueString()<<std::endl;
@@ -1162,7 +1161,7 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         // std::cout<<"it's a num"<<std::endl;
         return {};
     } else if( next.value().GetType() == CHAR){
-        std::cout<<"push "<<next.value().GetValueString()<<std::endl;
+        std::cout<<"push "<<(int)next.value().GetValueString()[0]<<std::endl;
         flist.back()._instrucs.emplace_back(Instruction(0x01, (int)next.value().GetValueString()[0], true));
         (*cnt)++;
         s.pushItem(INT_NUM);
@@ -1329,23 +1328,6 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
         flist.back()._instrucs.emplace_back(Instruction(0x01,pos,true));
         std::cout<<"print.s"<<std::endl;  (*cnt)++;
         flist.back()._instrucs.emplace_back(Instruction(0x57,0,false));
-    } else if ( t.GetValueString() == "putchar") {
-        if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
-            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-        auto err = Expression(cnt);
-        if(err.has_value()) return err;
-        next = nextToken(); 
-        if( !next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET)
-            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
-        if (s._stack.back() == INT_NUM)
-        {
-            std::cout << "print.c" << std::endl;
-            (*cnt)++;
-            flist.back()._instrucs.emplace_back(Instruction(0x55, 0, false));
-            s.popItem(); //弹栈
-        }
-        else
-            return std::make_optional<CompilationError>(ErrorCode::InvalidOutput);
     }
     else { // 剩下的都是print命令
         if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
@@ -1373,6 +1355,16 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
                 s.popItem();  //弹栈
             } else
                 return std::make_optional<CompilationError>(ErrorCode::InvalidOutput); 
+        } else if(t.GetValueString() == "putchar") {
+            if (s._stack.back() == INT_NUM)
+            {
+                std::cout << "print.c" << std::endl;
+                (*cnt)++;
+                flist.back()._instrucs.emplace_back(Instruction(0x55, 0, false));
+                s.popItem(); //弹栈
+            }
+            else
+                return std::make_optional<CompilationError>(ErrorCode::InvalidOutput);
         }
     }
     return {};
