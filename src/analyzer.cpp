@@ -9,8 +9,8 @@
 
 
 Stack s; // 模拟栈
-std::stack<int> stackBreak; // 保存break
-std::stack<int> stackConti; // 保存continue
+std::stack<std::pair<int, int> > stackBreak; // 保存break
+std::stack<std::pair<int, int> > stackConti; // 保存continue
 std::vector<FunctionList> flist; // 函数列表
 Layer l;
 int cmp = 0; // 用来区分 br.true 和 br.false
@@ -769,19 +769,20 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
     flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt - tmp), true));
     std::cout<<"should br "<<*cnt - jump_while<<std::endl;
     flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_while;  // 把跳转的值填回去
-    while(!stackBreak.empty()){
-        int pos = stackBreak.top();
+    while(!stackBreak.empty() && (layerWhile + 1) == stackBreak.top().first){
+        int pos = stackBreak.top().second;
         stackBreak.pop();
-        int jump_break = stackBreak.top();
+        int jump_break = stackBreak.top().second;
         stackBreak.pop();
         flist.back()._instrucs[pos].op_num = *cnt - jump_break;
         std::cout<<"br break "<<*cnt - jump_break<<std::endl;
     }
-    while (!stackConti.empty()) {
-        int pos = stackConti.top();
+    while (!stackConti.empty() && (layerWhile + 1) == stackConti.top().first) {
+        int pos = stackConti.top().second;
         stackConti.pop();
-        int jump_conti = stackConti.top();
+        int jump_conti = stackConti.top().second;
         stackConti.pop();
+        std::cout<<"continue pos "<<jump_conti<<std::endl;
         flist.back()._instrucs[pos].op_num = -(jump_conti - tmp);
         std::cout<<"br continue "<<-(jump_conti - tmp)<<std::endl;
     }
@@ -802,8 +803,8 @@ std::optional<CompilationError> Analyzer::BreakStatement(int *cnt)
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     // 跳转指令
     std::cout<<"br "<<std::endl; (*cnt)++;
-    stackBreak.push(*cnt); // 记录指令
-    stackBreak.push(flist.back()._instrucs.size()); // 保存break指令的位置
+    stackBreak.push(std::make_pair(layerWhile, *cnt)); // 记录指令
+    stackBreak.push(std::make_pair(layerWhile, flist.back()._instrucs.size())); // 保存break指令的位置
     flist.back()._instrucs.emplace_back(Instruction(0x41,0,true)); 
     return {};
 }
@@ -822,8 +823,8 @@ std::optional<CompilationError> Analyzer::ContinueStatement(int *cnt)
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     // 跳转指令
     std::cout<<"br "<<std::endl; (*cnt)++;
-    stackConti.push(*cnt); // 记录指令
-    stackConti.push(flist.back()._instrucs.size()); // 保存break指令的位置
+    stackConti.push(std::make_pair(layerWhile,*cnt)); // 记录指令
+    stackConti.push(std::make_pair(layerWhile,flist.back()._instrucs.size())); // 保存break指令的位置
     flist.back()._instrucs.emplace_back(Instruction(0x41,0,true)); 
     return {};
 }
