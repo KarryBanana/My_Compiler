@@ -22,6 +22,8 @@ enum ErrorCode{
   NoMain,
   CanNotCompare,
   FuncNotExist,
+  CanNotBreak,
+  CanNotContinue,
 };
 
 class CompilationError {
