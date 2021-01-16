@@ -769,7 +769,7 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
     flist.back()._instrucs.emplace_back(Instruction(0x41,-(*cnt - tmp), true));
     std::cout<<"should br "<<*cnt - jump_while<<std::endl;
     flist.back()._instrucs[jump_ins_idx].op_num = *cnt - jump_while;  // 把跳转的值填回去
-    while(!stackBreak.empty() && (layerWhile + 1) == stackBreak.top().first){
+    while(!stackBreak.empty() && (layerWhile + 1) == stackBreak.top().first){ // layerWhile 已经减1了 这里先加起来 必须是处理这层while里的break continue
         int pos = stackBreak.top().second;
         stackBreak.pop();
         int jump_break = stackBreak.top().second;
@@ -1161,7 +1161,11 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         (*cnt)++;
         // std::cout<<"it's a num"<<std::endl;
         return {};
-    } else if( next.value().GetType() == STRING) {
+    } else if( next.value().GetType() == CHAR){
+        std::cout<<"push "<<next.value().GetValueString()<<std::endl;
+        flist.back()._instrucs.emplace_back(Instruction(0x01, (int)next.value().GetValueString()[0], true));
+        (*cnt)++;
+        s.pushItem(INT_NUM);
         return {};
     }
     else {
@@ -1325,7 +1329,24 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
         flist.back()._instrucs.emplace_back(Instruction(0x01,pos,true));
         std::cout<<"print.s"<<std::endl;  (*cnt)++;
         flist.back()._instrucs.emplace_back(Instruction(0x57,0,false));
-    } 
+    } else if ( t.GetValueString() == "putchar") {
+        if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+        auto err = Expression(cnt);
+        if(err.has_value()) return err;
+        next = nextToken(); 
+        if( !next.has_value() || next.value().GetType() != TokenType::RIGHT_BRACKET)
+            return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
+        if (s._stack.back() == INT_NUM)
+        {
+            std::cout << "print.c" << std::endl;
+            (*cnt)++;
+            flist.back()._instrucs.emplace_back(Instruction(0x55, 0, false));
+            s.popItem(); //弹栈
+        }
+        else
+            return std::make_optional<CompilationError>(ErrorCode::InvalidOutput);
+    }
     else { // 剩下的都是print命令
         if( !next.has_value() || next.value().GetType() != TokenType::LEFT_BRACKET )
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
@@ -1352,13 +1373,6 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
                 s.popItem();  //弹栈
             } else
                 return std::make_optional<CompilationError>(ErrorCode::InvalidOutput); 
-        } else{
-            if (s._stack.back() == INT_NUM) {
-                std::cout << "print.c" << std::endl; (*cnt)++;
-                flist.back()._instrucs.emplace_back(Instruction(0x55,0,false));
-                s.popItem();  //弹栈
-            } else
-                return std::make_optional<CompilationError>(ErrorCode::InvalidOutput);    
         }
     }
     return {};
