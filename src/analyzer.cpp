@@ -177,7 +177,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
             out.write(reverseData((unsigned char *)&instrucNum, sizeof(char)), sizeof(char));  // 指令数
             if (ins.has_op_num){
                 if(ins.ins_num == 0x01){
-                    if(ins.op_num.type() == typeid(int)){
+                    if(ins.op_num.type() == typeid(long long)){
                         long long op_num = std::any_cast<long long>(ins.op_num);
                         out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
                     } else {
@@ -214,14 +214,15 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                     sizeof(char));  // 指令数
                 if (ins.has_op_num) {
                     if (ins.ins_num == 0x01) {
-                        if (ins.op_num.type() == typeid(int)) {
-                            long long op_num = std::any_cast<int>(ins.op_num);
+                        if (ins.op_num.type() == typeid(long long)) {
+                            std::cout<<"jin lai le "<<std::endl;
+                            long long op_num = std::any_cast<long long>(ins.op_num);
                             std::cout<<"here op num is "<<op_num<<std::endl;
                             out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
                         }
                         else {
                             double op_num = std::any_cast<double>(ins.op_num);
-                            std::cout<<"here op num is "<<op_num<<std::endl;
+                            // std::cout<<"here op num is "<<op_num<<std::endl;
                             out.write(reverseData((unsigned char *)&op_num, sizeof(double)), sizeof(double)); // push操作数是8字节
                         }
                     }
@@ -921,12 +922,6 @@ std::optional<CompilationError> Analyzer::Expression(int *cnt)
         return std::make_optional<CompilationError>(ErrorCode::CanNotAssign);
     }
     // 赋值
-    std::cout<<"now var is double? "<<var.value().is_double<<std::endl;
-    std::cout<<"stack top is "<<s._stack.back()<<std::endl;
-    if(var.value().is_double && s._stack.back() == INT_NUM) // double类型赋值int 报错
-        return std::make_optional<CompilationError>(ErrorCode::CanNotAssign);
-    if(var.value().is_int && s._stack.back() == DOUBLE_NUM) // int类型赋值double 报错
-        return std::make_optional<CompilationError>(ErrorCode::CanNotAssign);
     std::cout << "store.64" << std::endl;
     flist.back()._instrucs.emplace_back(Instruction(0x17,0,false)); // 存入指令
     (*cnt)++;
@@ -1223,7 +1218,8 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         s.pushItem(INT_NUM);
         std::string num = next.value().GetValueString();
         std::cout<<"push "<<num<<std::endl;
-        flist.back()._instrucs.emplace_back(Instruction(0x01,std::stoi(num),true));
+        flist.back()._instrucs.emplace_back(Instruction(0x01,std::stoll(num),true));
+        std::cout<<"unsigned long long is "<<std::stoll(num)<<std::endl;
         (*cnt)++;
         // std::cout<<"it's not a float"<<std::endl;
         return {};
@@ -1265,31 +1261,88 @@ std::optional<CompilationError> Analyzer::IdentExpr(int *cnt)
                 flist.back()._instrucs.emplace_back(Instruction(0x0c,idx,true));
                 (*cnt)++;
                 s.pushItem(ADDR);
+                auto next = nextToken(); // 看下一个是不是 =
+                unreadToken();
+                if (next.value().GetType() != TokenType::ASSIGN_SIGN)
+                {
+                    std::cout << "load.64" << std::endl; // 如果后面没有 =
+                    flist.back()._instrucs.emplace_back(Instruction(0x13, 0, false));
+                    (*cnt)++;
+                    s.popItem();
+                    if (l.action_layer.front().symbols[idx].is_int)
+                        s.pushItem(INT_NUM); // 后面要补充Double情况
+                    if (l.action_layer.front().symbols[idx].is_double)
+                        s.pushItem(DOUBLE_NUM);
+                }
+                else
+                {
+                    if (flag_const == true)
+                    { // 如果const变量后面跟了一个=，报错
+                        return std::make_optional<CompilationError>(ErrorCode::AssignToConst);
+                    }
+                }
             }
         } else {
             std::cout<<"loca "<<idx<<std::endl; // 加载局部变量地址入栈
             flist.back()._instrucs.emplace_back(Instruction(0x0a,idx,true));
             (*cnt)++;
             s.pushItem(ADDR);
+            auto next = nextToken(); // 看下一个是不是 =
+                unreadToken();
+                if (next.value().GetType() != TokenType::ASSIGN_SIGN)
+                {
+                    std::cout << "load.64" << std::endl; // 如果后面没有 =
+                    flist.back()._instrucs.emplace_back(Instruction(0x13, 0, false));
+                    (*cnt)++;
+                    s.popItem();
+                    if (flist.back()._vars[idx].is_int)
+                    {
+                        s.pushItem(INT_NUM); // 后面要补充Double情况
+                    }
+                    if (flist.back()._vars[idx].is_double)
+                    {
+                        s.pushItem(DOUBLE_NUM);
+                    }
+                }
+                else
+                {
+                    if (flag_const == true)
+                    { // 如果const变量后面跟了一个=，报错
+                        return std::make_optional<CompilationError>(ErrorCode::AssignToConst);
+                    }
+                }
         }
     } else {
+        int tmp = idx;
         if(flist.back().returnType) // 如果是int类型函数,参数位置往后挪一个留给return 
-            idx++;
-        std::cout<<"arga "<<idx<<std::endl; // 加载函数参数地址入栈
-        flist.back()._instrucs.emplace_back(Instruction(0x0b,idx,true));
+            tmp++;
+        std::cout<<"arga "<<tmp<<std::endl; // 加载函数参数地址入栈
+        flist.back()._instrucs.emplace_back(Instruction(0x0b,tmp,true));
         (*cnt)++;
         s.pushItem(ADDR);
-    }
-    auto next = nextToken(); // 看下一个是不是 =
-    unreadToken();
-    if( next.value().GetType() != TokenType::ASSIGN_SIGN ){
-        std::cout<<"load.64"<<std::endl; // 如果后面没有 = 
-        flist.back()._instrucs.emplace_back(Instruction(0x13,0,false));
-        (*cnt)++;
-        s.popItem(); s.pushItem(INT_NUM); // 后面要补充Double情况
-    } else {
-        if(flag_const == true){ // 如果const变量后面跟了一个=，报错
-            return std::make_optional<CompilationError>(ErrorCode::AssignToConst);
+        auto next = nextToken(); // 看下一个是不是 =
+        unreadToken();
+        if (next.value().GetType() != TokenType::ASSIGN_SIGN)
+        {
+            std::cout << "load.64" << std::endl; // 如果后面没有 =
+            flist.back()._instrucs.emplace_back(Instruction(0x13, 0, false));
+            (*cnt)++;
+            s.popItem();
+            if (flist.back()._params[idx].is_int)
+            {
+                s.pushItem(INT_NUM); // 后面要补充Double情况
+            }
+            if (flist.back()._params[idx].is_double)
+            {
+                s.pushItem(DOUBLE_NUM);
+            }
+        }
+        else
+        {
+            if (flag_const == true)
+            { // 如果const变量后面跟了一个=，报错
+                return std::make_optional<CompilationError>(ErrorCode::AssignToConst);
+            }
         }
     }
     return {};
@@ -1599,6 +1652,7 @@ bool Stack::canOper()
     s._stack.pop_back();
     StackItem second_top = s._stack.back();
     s._stack.emplace_back(top); // 装回去
+    // std::cout<<"top is "<<top<<" second top is "<<second_top<<std::endl;
     if ( (top == INT || top == INT_NUM ) && 
             (second_top == INT || second_top == INT_NUM) )
         return true;
@@ -1692,7 +1746,7 @@ bool Stack::cmpDouble()
     s.pushItem(INT_NUM); // 比较结果为-1 0 1
     
     std::cout<<"cmp.f"<<std::endl;
-    flist.back()._instrucs.emplace_back(Instruction(0x52,0,false));
+    flist.back()._instrucs.emplace_back(Instruction(0x32,0,false));
     return true;
 }
 
