@@ -1229,7 +1229,7 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         (*cnt)++;  
     } else if( next.value().GetType() == CHAR){
         std::cout<<"push "<<(long long)next.value().GetValueString()[0]<<std::endl;
-        flist.back()._instrucs.emplace_back(Instruction(0x01, (int)next.value().GetValueString()[0], true));
+        flist.back()._instrucs.emplace_back(Instruction(0x01, (long long)next.value().GetValueString()[0], true));
         (*cnt)++;
         s.pushItem(INT_NUM);
         return {};
