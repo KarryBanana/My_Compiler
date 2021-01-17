@@ -24,6 +24,7 @@ enum ErrorCode{
   FuncNotExist,
   CanNotBreak,
   CanNotContinue,
+  CanNotConvert,
 };
 
 class CompilationError {
