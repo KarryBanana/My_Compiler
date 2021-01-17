@@ -182,7 +182,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                         out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
                     } else {
                         double op_num =  std::any_cast<double>(ins.op_num);
-                        out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
+                        out.write(reverseData((unsigned char *)&op_num, sizeof(double)), sizeof(double)); // push操作数是8字节
                     }
                 }
                 else{
@@ -215,9 +215,7 @@ std::optional<CompilationError> Analyzer::Program(std::string output)
                 if (ins.has_op_num) {
                     if (ins.ins_num == 0x01) {
                         if (ins.op_num.type() == typeid(long long)) {
-                            std::cout<<"jin lai le "<<std::endl;
                             long long op_num = std::any_cast<long long>(ins.op_num);
-                            std::cout<<"here op num is "<<op_num<<std::endl;
                             out.write(reverseData((unsigned char *)&op_num, sizeof(long long)), sizeof(long long)); // push操作数是8字节
                         }
                         else {
@@ -1218,8 +1216,8 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         s.pushItem(INT_NUM);
         std::string num = next.value().GetValueString();
         std::cout<<"push "<<num<<std::endl;
-        flist.back()._instrucs.emplace_back(Instruction(0x01,std::stoll(num),true));
-        std::cout<<"unsigned long long is "<<std::stoll(num)<<std::endl;
+        long long tmp = std::stoll(num);
+        flist.back()._instrucs.emplace_back(Instruction(0x01,tmp,true));
         (*cnt)++;
         // std::cout<<"it's not a float"<<std::endl;
         return {};
@@ -1230,7 +1228,7 @@ std::optional<CompilationError> Analyzer::BeforeExpr(int *cnt)
         flist.back()._instrucs.emplace_back(Instruction(0x01,std::stod(f),true)); 
         (*cnt)++;  
     } else if( next.value().GetType() == CHAR){
-        std::cout<<"push "<<(int)next.value().GetValueString()[0]<<std::endl;
+        std::cout<<"push "<<(long long)next.value().GetValueString()[0]<<std::endl;
         flist.back()._instrucs.emplace_back(Instruction(0x01, (int)next.value().GetValueString()[0], true));
         (*cnt)++;
         s.pushItem(INT_NUM);
@@ -1451,7 +1449,7 @@ std::optional<CompilationError> Analyzer::StdIO(Token t,int *cnt)
         l.action_layer.front().symbols.emplace_back(ss); // STRING是一个全局常量
         int pos = l.action_layer.front().symbols.size() - 1;
         std::cout<<"push "<<pos<<std::endl; (*cnt)++; // 加载到栈上  
-        flist.back()._instrucs.emplace_back(Instruction(0x01,pos,true));
+        flist.back()._instrucs.emplace_back(Instruction(0x01,(long long)pos,true));
         std::cout<<"print.s"<<std::endl;  (*cnt)++;
         flist.back()._instrucs.emplace_back(Instruction(0x57,0,false));
     }
