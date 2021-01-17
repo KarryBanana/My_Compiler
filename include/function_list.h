@@ -13,7 +13,7 @@ class FunctionList{
     int getFuncIdx(std::string name);
   
   public:
-    bool void_return; // 是否是void return
+    int returnType; // 是否是void return
     std::string func_name; // 函数名
     std::vector<Token> _vars; // 局部变量
     std::vector<Token> _params; // 参数
