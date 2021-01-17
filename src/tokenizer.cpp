@@ -287,7 +287,10 @@ Tokenizer::nextToken()
         return std::make_pair(std::make_optional<Token>(TokenType::FLOAT,
                                                         num),
                               std::optional<CompilationError>()); 
-      }
+      } 
+      else 
+        return std::make_pair(std::optional<Token>(),
+                              std::make_optional<CompilationError>(ErrorCode::InvalidInput)); 
     }
     case STRING_STATE:
     {
