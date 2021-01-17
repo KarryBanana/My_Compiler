@@ -16,6 +16,14 @@ class Stack{
      void pushItem(StackItem);
      void popItem();
      bool canOper();
+     void addInt();
+     void addDouble();
+     void subInt();
+     void subDouble();
+     void mulInt();
+     void mulDouble();
+     void divInt();
+     void divDouble();
      bool cmpInt();
      bool cmpDouble();
      void setLess();
