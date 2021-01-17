@@ -7,6 +7,7 @@
 enum TokenType {
   NULL_TOKEN,
   UNSIGNED_INTEGER,
+  FLOAT, // 浮点数
   STRING, // 字符串
   CHAR, // 字符
   IDENTIFIER,
