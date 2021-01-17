@@ -201,12 +201,6 @@ Tokenizer::nextToken()
       // 当前状态是无符号整数
     case UNSIGNED_INTEGER_STATE:
     {
-      // 请填空：
-      // 如果当前已经读到了文件尾，则解析已经读到的字符串为整数
-      //     解析成功则返回无符号整数类型的token，否则返回编译错误
-      // 如果读到的字符是数字，则存储读到的字符
-      // 如果读到的字符不是数字，则回退读到的字符，并解析已经读到的字符串为整数
-      //     解析成功则返回无符号整数类型的token，否则返回编译错误
       if (!current_char.has_value())
       {
         std::string num;
@@ -219,6 +213,11 @@ Tokenizer::nextToken()
       auto ch = current_char.value();
       if (isdigit(ch))
         ss << ch;
+      else if(ch == '.'){ // 出现浮点数的标志
+        ss << ch;
+        current_state = DFAState::FLOAT_STATE;
+        break;
+      }
       else
       {
         unreadLast();
@@ -233,6 +232,62 @@ Tokenizer::nextToken()
                               std::optional<CompilationError>());
       }
       break;
+    }
+    case FLOAT_STATE:
+    {
+      if(!current_char.has_value()){
+         unreadLast();
+        return std::make_pair(std::optional<Token>(),
+                              std::make_optional<CompilationError>(ErrorCode::InvalidInput));
+      }
+      auto ch = current_char.value();
+      if(isdigit(ch)){ // 读完.之后必须是数字
+        ss << ch;
+        ch = nextChar().value();
+        while(isdigit(ch)){
+          ss << ch;
+          ch = nextChar().value();
+        }
+        unreadLast();
+      }
+      else
+        return std::make_pair(std::optional<Token>(),
+                              std::make_optional<CompilationError>(ErrorCode::InvalidInput));
+      auto ch_peek = nextChar();
+      if(!ch_peek.has_value() || (ch_peek.value() != 'e' && ch_peek.value() != 'E') ){ // 只用1.999这种
+        unreadLast();
+        std::string num;
+        ss >> num;
+        ss.clear();
+        std::cout<<"here float is "<<num<<std::endl;
+        return std::make_pair(std::make_optional<Token>(TokenType::FLOAT,
+                                                        num),
+                              std::optional<CompilationError>());   
+      }
+      ss << ch_peek.value();
+      ch_peek = nextChar(); // 紧跟eE后的第一个字符
+      if(!ch_peek.has_value() || (ch_peek.value() != '+' && ch_peek.value() != '-' && (!isdigit(ch_peek.value()))))
+        return std::make_pair(std::optional<Token>(),
+                              std::make_optional<CompilationError>(ErrorCode::InvalidInput));
+      if(ch_peek.value() == '+' || ch_peek.value() == '-'){
+        ss << ch_peek.value();
+        ch_peek = nextChar();
+      }
+      if(isdigit(ch_peek.value())){
+        ss << ch_peek.value();
+        ch_peek = nextChar();
+        while(ch_peek.has_value() && isdigit(ch_peek.value())){
+          ss << ch_peek.value();
+          ch_peek = nextChar();
+        }
+        unreadLast();
+        std::string num;
+        ss >> num; ss.clear();
+        std::cout<<"here float is "<<num<<std::endl;
+        return std::make_pair(std::make_optional<Token>(TokenType::FLOAT,
+                                                        num),
+                              std::optional<CompilationError>()); 
+      }
     }
     case STRING_STATE:
     {
@@ -322,7 +377,7 @@ Tokenizer::nextToken()
       }
       else if (ch == '\'')
       { // 结束了
-        std::cout<<"i read a char: "<<c<<std::endl;
+        ss.clear();
         return std::make_pair(std::make_optional<Token>(TokenType::CHAR,
                                                         c),
                               std::optional<CompilationError>());
