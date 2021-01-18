@@ -25,6 +25,7 @@ enum ErrorCode{
   CanNotBreak,
   CanNotContinue,
   CanNotConvert,
+  NoReturn,
 };
 
 class CompilationError {
