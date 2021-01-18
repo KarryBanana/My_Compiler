@@ -16,10 +16,7 @@ Layer l;
 int cmp = 0; // 用来区分 br.true 和 br.false
 int main_num = -1; // 用来记main函数的编号
 int layerWhile = 0; // 判断break continue是否在while里面
-int ifReturn = 0; //看if块里是否有return
-int ifBlock = 0; // 记录几个if块
-int whileReturn = 1; //看while块里是否有return
-int whileBlock = 0; // 记录几个while块
+
 char* Analyzer::reverseData(unsigned char *num, int len)
 {
     unsigned char *tmp = (unsigned char *)malloc(len * sizeof(char));
@@ -276,9 +273,8 @@ std::optional<CompilationError> Analyzer::DeclareStatement(int *cnt)
 // funciton函数语句
 std::optional<CompilationError> Analyzer::Function()
 {
+    // std::cout<<"function declare"<<std::endl;
     // 读到一个函数
-    ifReturn = ifBlock = 0; // if块清零
-    whileReturn = 1; whileBlock = 0; 
     struct FunctionList f;
     flist.emplace_back(f);
     // FN
@@ -349,12 +345,6 @@ std::optional<CompilationError> Analyzer::Function()
          return block_stmt;
     if(flist.back().returnType == 0)
         flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
-    if(flist.back().returnType != 0) { // 有返回值但是有的块无法导向return 
-        if(ifReturn)
-            return std::make_optional<CompilationError>(ErrorCode::NoReturn);
-        if(whileReturn)
-            return std::make_optional<CompilationError>(ErrorCode::NoReturn);
-    }
     return {};
 }
 
@@ -726,11 +716,9 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
         (*cnt)++;
     }
     int jump_if = *cnt;
-    ifBlock++; ifReturn++;
     // block_stmt
     err = BlockStatement(cnt);
     if ( err.has_value() ) return err;
-    ifBlock--;
     std::cout<<"br else"<<std::endl; (*cnt)++;
     int jump_else = *cnt; //执行完if块里的代码准备跳过所有else块
     int jump_ins_else = flist.back()._instrucs.size(); // 准备br else的指令的位置
@@ -747,10 +735,8 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
             // 报错
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
         if(next.value().GetType() == TokenType::L_BRACE){
-            ifReturn++; ifBlock++;
             err = BlockStatement(cnt);
             if( err.has_value() ) return err;
-            ifBlock--;
         } else if( next.value().GetType() == TokenType:: IF){
             err = IfStatement(cnt);
             if( err.has_value() )  return err;
@@ -758,7 +744,6 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
             return std::make_optional<CompilationError>(ErrorCode::InvalidInput); // 报错 
     }
     else{
-        ifReturn++;
         unreadToken();
     }
     std::cout<<"if br "<<*cnt - jump_else<<std::endl; // if执行完要跳过的else块
@@ -769,7 +754,6 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
 std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
 {
     int tmp = *cnt; //保存cnt
-    whileBlock++; whileReturn++;
     auto next = nextToken();
     // while
     if( !next.has_value() || next.value().GetType() != TokenType::WHILE )
@@ -800,7 +784,6 @@ std::optional<CompilationError> Analyzer::WhileStatement(int *cnt)
     if( err.has_value() )
         return err;
     // 此处无条件跳转回到头
-    whileBlock--;
     layerWhile--; // 结束一个while层
     (*cnt)++;
     std::cout<<"br "<<-(*cnt - tmp)<<std::endl;
@@ -906,14 +889,6 @@ std::optional<CompilationError> Analyzer::ReturnStatement(int *cnt)
         return std::make_optional<CompilationError>(ErrorCode::InvalidInput);
     std::cout<<"ret"<<std::endl; (*cnt)++;
     flist.back()._instrucs.emplace_back(Instruction(0x49,0,false));
-    if( !ifBlock) // if块结尾读到return while块外读到return 所有块return 
-        ifReturn =  0;
-    else 
-        ifReturn--; // 非结尾读到return
-    if( !whileBlock )
-        whileReturn = 0;
-    else 
-        whileReturn--;
     return {};
 }
 // 空代码块
