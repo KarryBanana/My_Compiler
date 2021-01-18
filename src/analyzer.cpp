@@ -750,6 +750,8 @@ std::optional<CompilationError> Analyzer::IfStatement(int *cnt)
             ifReturn++; ifBlock++;
             err = BlockStatement(cnt);
             if( err.has_value() ) return err;
+            if(ifReturn == 1)
+                ifReturn = 0;
             ifBlock--;
         } else if( next.value().GetType() == TokenType:: IF){
             err = IfStatement(cnt);
